@@ -1,0 +1,122 @@
+html {
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(32, 32, 32, 1));
+  }
+  
+  body {
+    color: rgb(232, 232, 232);
+  }
+  
+  button {
+    background-color: #222222;
+    color: #EEEEEE;
+    width: 100%;
+  }
+  
+  button:hover {
+    color: #EEEEEE;
+  }
+  
+  code {
+    background-color: #515253;
+  }
+  
+  th,
+  td {
+    border-bottom: 1px solid #333435;
+    padding: 7px 9px;
+  }
+  
+  input {
+    color: #111111;
+  }
+  
+  hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-top: 1px solid #515254;
+  }
+  
+  .invalid {
+    border: 2px solid #EE3333;
+    background-color: #FFEEEE;
+  }
+  
+  .right {
+    float: right;
+  }
+  
+  .no-margin {
+    margin: 0;
+  }
+  
+  h5.no-margin {
+    padding: 0.41rem;
+  }
+  
+  a:link,
+  a:visited {
+    color: #BBBBBB;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    color: #EEEEEE;
+    text-decoration: underline;
+  }
+  
+  footer {
+    color: #999999;
+    font-size: 1.2rem;
+  }
+  
+  .fill {
+    width: 100%;
+    margin-top: 15px;
+  }
+  
+  .align-right {
+    text-align: right;
+  }
+  
+  header {
+    margin-top: 1rem;
+  }
+  
+  .view {
+    max-width: 960px;
+    min-height: 480px;
+  }
+  
+  #txtNickname {
+    margin-top: 1.35rem;
+  }
+  
+  #game {
+    width: 640px;
+    height: 480px;
+    margin-left: 160px;
+  }
+  
+  #message {
+    color: #DD6666;
+    font-style: italic;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Detris</title>
+    <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="static/css/normalize.css">
+    <link rel="stylesheet" href="static/css/skeleton.css">
+    <link rel="stylesheet" href="static/css/main.css?v=0.0.2">
+  </head>
+  <body>
+    <div class="container">
+      <header class="row">
+        <div class="twelve columns">
+          <h5>DETRIS</h5>
+          <hr>
+        </div>
+      </header>
+    </div>
+  <div class="container view" id="viewMenu">
+    <div class="row">
+      <div class="four columns">
+        <input class="u-full-width" type="text" placeholder="Nickname" id="txtNickname">
+        <span id="message" class="hidden">Testerr</span>
+        <button id="btnStart">Start game</button>
+        <br>
+        <br>
+        <h5>Instructions</h5>
+        <hr>
+        <table class="fill">
+         <tr>
+           <td>Move left</td>
+           <td class="align-right"><code>Left</code></td>
+         </tr>
+         <tr>
+           <td>Move right</td>
+           <td class="align-right"><code>Right</code></td>
+         </tr>
+         <tr>
+           <td>CW rotation</td>
+           <td class="align-right"><code>Up</code> or <code>A</code></td>
+         </tr>
+         <tr>
+           <td>CCW rotation</td>
+           <td class="align-right"><code>D</code></td>
+         </tr>
+         <tr>
+           <td>Soft drop</td>
+           <td class="align-right"><code>Down</code></td>
+         </tr>
+         <tr>
+           <td>Hard drop</td>
+           <td class="align-right"><code>Space</code></td>
+         </tr>
+        </table>
+      </div>
+      <div class="four columns">
+        <h5>All time high</h5>
+        <hr>
+        <div id="hsAth">
+        </div>
+      </div>
+      <div class="four columns">
+        <h5>Last 7 days</h5>
+        <hr>
+        <div id="hsWeek">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewGame" style="display: none;">
+    <div class="row">
+      <div class="twelve columns">
+        <div id="game"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewHighscore" style="display: none;">
+    <div class="row">
+      <div class="four columns">
+        <h5>Game over</h5>
+        <hr>
+        <div id="hsYourScore">
+          <!-- Your score details will be dynamically added here -->
+        </div>
+        <button id="btnNewGame">Play Again!</button>
+      </div>
+      <div class="four columns">
+        <h5>All Time High</h5>
+        <hr>
+        <div id="hsAllTime">
+          <!-- All-time highscore entries will be dynamically added here -->
+        </div>
+      </div>
+      <div class="four columns">
+        <h5>Last 7 Days</h5>
+        <hr>
+        <div id="hsLast7Days">
+          <!-- Last 7 days highscore entries will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container view" id="viewAborted" style="display: none;">
+    <div class="row">
+      <div class="twelve columns">
+        <h6>Game Aborted</h6>
+        <hr>
+        <p>The game was aborted. Please try again.</p>
+        <button id="btnRestart">Play Again!</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewLoading" style="display: none;">
+    <div class="row">
+      <div class="twelve columns d-flex align-items-center justify-content-center">
+        <div class="text-center">
+          <h6>Starting game ...</h6>
+          <hr>
+          <p>Please stand by</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <hr>
+    <footer class="row">
+      <div class="twelve columns">
+        <span class="right">
+          Source Code:
+          <a href="http://github.com/hexagon/detris">github.com/hexagon/detris</a> |
+          <a href="https://en.wikipedia.org/wiki/MIT_License">MIT</a>
+          License
+         </span>
+         <span>
+           Powered By:
+           <a href="https://deno.com/">Deno</a> |
+           <a href="https://www.docker.com/">Docker</a> |
+           <a href="http://getskeleton.com/">Skeleton</a>
+         </span>
+      </div>
+    </footer>
+  </div>
+
+  <a href="https://github.com/hexagon/detris" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  <script type="module" src="static/js/main.js"></script>
+</body>
+</html>
