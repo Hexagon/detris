@@ -21,7 +21,7 @@ export class Game {
   }
 
   async setup(nickname, control) {
-    const self = this
+    const self = this;
     const done = new Promise(function (resolve, reject) {
       const timeout = setTimeout(() => {
         reject(new Error("Connection timeout"));
@@ -55,7 +55,7 @@ export class Game {
 
       // Attach controls
       control.setHandleChange((c) => {
-        self.server.sendControlsChange(c)
+        self.server.sendControlsChange(c);
       });
     });
 

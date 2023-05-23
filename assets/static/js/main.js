@@ -4,20 +4,19 @@
  * @file js/main.js
  */
 
-import controls from "./controls.js"
+import controls from "./controls.js";
 import { onScreenEvent, showScreen } from "./gui.js";
 import { Game } from "./game.js";
 
 let currentGame = undefined;
 
 // Initialize controls
-const controller = controls.initialize()
+const controller = controls.initialize();
 
 // Show login screen
 showScreen("login");
 
 const newGame = async (nickname) => {
-
   showScreen("loading");
 
   // New game
@@ -37,7 +36,7 @@ const newGame = async (nickname) => {
 
   // Reset game
   currentGame = null;
-}
+};
 onScreenEvent("login", "done", newGame);
 
 onScreenEvent("highscore", "newgame", newGame);

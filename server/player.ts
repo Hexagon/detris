@@ -23,9 +23,7 @@ export async function Player(
   let ready = false;
 
   const loop = () => {
-
     if (ready && !g.iterate()) {
-
       // End condition
       socket.send('{ "gameOver": true }');
 
@@ -39,7 +37,7 @@ export async function Player(
       });
 
       // End game
-      ready = false
+      ready = false;
 
       return;
     }
@@ -48,7 +46,6 @@ export async function Player(
     if (ready) {
       setTimeout(() => loop(), 1500);
     }
-    
   };
 
   socket.addEventListener("open", async () => {

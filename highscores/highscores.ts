@@ -40,7 +40,6 @@ export async function read(): Promise<HighscoreMessage | null> {
     ath.push(hs);
   }
 
-  
   ath.sort((a, b) => b.score - a.score);
   week.sort((a, b) => b.score - a.score);
 

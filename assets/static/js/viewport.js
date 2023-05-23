@@ -9,10 +9,9 @@ import { canvasFactory } from "./canvas.js";
 let dimensions = null,
   canvas = null,
   context = null,
-  game = null
+  game = null;
 
 const viewport = {
-
   drawBackground() {
     context.fillStyle = "rgb(64,64,64)";
     context.fillRect(190, 10, 220, dimensions.height - 60);
@@ -126,7 +125,7 @@ const viewport = {
   },
 
   redraw(inGame) {
-    game = inGame
+    game = inGame;
     if (game && game.data && context) {
       context.clearRect(0, 0, dimensions.width, dimensions.height);
 

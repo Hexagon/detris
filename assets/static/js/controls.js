@@ -46,9 +46,9 @@ const initialize = (network) => {
 
   return {
     setHandleChange: (callback) => {
-      handleChange = callback
-    }
-  }
+      handleChange = callback;
+    },
+  };
 };
 
 export default {

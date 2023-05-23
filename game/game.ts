@@ -69,7 +69,7 @@ export class Game {
     try {
       this.socket.send(m);
     } catch (e) {
-      console.error("Tried to send to closed socket")
+      console.error("Tried to send to closed socket");
     }
   }
 
@@ -280,7 +280,7 @@ export class Game {
     // Notify that stuf has changed
     this.changed();
 
-    this.safeSocketSend(this.updateGrid())
+    this.safeSocketSend(this.updateGrid());
 
     return true;
   }
@@ -343,12 +343,12 @@ export class Game {
 
   validMove(s: Vector[], p: Vector): boolean {
     for (const v of s) {
-      
       // Check that there is space below
       const targetX = v.X + p.X;
       const targetY = v.Y + p.Y; // Increment Y position by 1
       const outOfRange = targetX < 0 || targetX > 10 - 1 || targetY < 0 ||
-        targetY > 22 - 1 || (this.grid.Data[targetX + targetY * 10] !== undefined) ;
+        targetY > 22 - 1 ||
+        (this.grid.Data[targetX + targetY * 10] !== undefined);
       if (outOfRange) { // Check for undefined instead of null
         return false;
       }
