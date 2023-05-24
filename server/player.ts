@@ -52,7 +52,7 @@ export async function Player(
 
     // Recurse!
     if (ready) {
-      setTimeout(() => loop(), 1500);
+      setTimeout(() => loop(), 50);
     }
   };
 

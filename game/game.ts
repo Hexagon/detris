@@ -163,21 +163,22 @@ export class Game {
   }
 
   iterate(): boolean {
-    if (
-      ((new Date()).getTime() - this.timerModified.getDate()) >
-        this.iterateDelayMs()
-    ) {
+    const currentTime = new Date().getTime();
+    const timeDifference = currentTime - this.timerModified.getTime();
+    const iterateDelay = this.iterateDelayMs();
+    if (timeDifference > iterateDelay) {
       // Reset timer
       this.timerReal = new Date();
       this.timerModified = new Date();
-
+  
       if (!this.moveDown()) {
         return this.lockdown();
       }
     }
-
+  
     return true;
   }
+
   iterateDelayMs(): number {
     // Reduce 10 ms for each level
     let delay = 500 - 20 * this.Level;
