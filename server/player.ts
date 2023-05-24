@@ -29,34 +29,36 @@ export async function Player(
   let ready = false;
 
   const loop = () => {
-    // Update score in database
-    if (g.Score != lastWriteScore) {
-      lastWriteScore = g.Score;
-      highscores.write({
-        nickname: g.Nickname,
-        score: g.Score,
-        level: g.Level,
-        lines: g.Lines,
-        ts: new Date(),
-        tsInit: initializationTime,
-      });
-    }
 
-    // Check for end condition
-    if (ready && !g.iterate()) {
-      // End condition
-      try {
-        socket.send('{ "gameOver": true }');
-      } catch (e) {
-        console.error("Lost connection to client ...");
+    if (ready) {
+      // Update score in database
+      if (g.Score != lastWriteScore) {
+        lastWriteScore = g.Score;
+        highscores.write({
+          nickname: g.Nickname,
+          score: g.Score,
+          level: g.Level,
+          lines: g.Lines,
+          ts: new Date(),
+          tsInit: initializationTime,
+        });
       }
+      
+      // Check for end condition
+      if (!g.iterate()) {
+        // End condition
+        try {
+          socket.send('{ "gameOver": true }');
+        } catch (e) {
+          console.error("Lost connection to client ...");
+        }
 
-      // End game
-      ready = false;
+        // End game
+        ready = false;
 
-      return;
+        return;
+      }
     }
-
     // Recurse!
     if (ready) {
       setTimeout(() => loop(), 50);
