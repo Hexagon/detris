@@ -1,5 +1,9 @@
+
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
 html {
-    height: 100%;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(32, 32, 32, 1));
   }
   
@@ -65,9 +69,19 @@ html {
     text-decoration: underline;
   }
   
+  #wrapper {
+    min-height: 100%;
+  }
+
   footer {
     color: #999999;
     font-size: 1.2rem;
+    position: fixed;
+    bottom: 0px;
+    width: calc(100% - 2em);
+    padding: 1em;
+    background-color: #232425;
+    border-top: 1px solid #323334;
   }
   
   .fill {
@@ -84,7 +98,12 @@ html {
   }
   
   .view {
-    max-width: 960px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left:-480px;
+    margin-top:-240px;
+    width: 960px;
     min-height: 480px;
   }
   

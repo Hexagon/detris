@@ -1,36 +1,49 @@
-// js/network.js
-function url(s) {
-  const l = window.location,
-    dir = l.pathname.substring(0, l.pathname.lastIndexOf("/"));
+// network.js
+class Network {
+  constructor() {
+    this.ws = null;
+  }
 
-  return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + dir + s;
+  #url(s) {
+    const l = window.location;
+    const dir = l.pathname.substring(0, l.pathname.lastIndexOf("/"));
+  
+    return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + dir + s;
+  }
+
+  async connect(uri, messageCallback, connectCallback, disconnectCallback) {
+
+    // Set up promise
+    let resolver;
+    const done = new Promise((resolve) => {
+      resolver = resolve
+    })
+
+    this.ws = new WebSocket(this.#url(uri));
+
+    // In
+    this.ws.onmessage = (m) => {
+      const data = JSON.parse(m.data);
+      messageCallback && messageCallback(data);
+    };
+
+    this.ws.onopen = () => {
+      resolver();
+      connectCallback;
+    }
+
+    this.ws.onclose = disconnectCallback;
+
+    return await done
+  }
+
+  sendControlsChange(data) {
+    this.ws.send(JSON.stringify({ packet: "key", data: data }));
+  }
+
+  sendPlayerReady(nickname) {
+    this.ws.send(JSON.stringify({ packet: "ready", nickname: nickname }));
+  }
 }
 
-const connect = (uri, onMessage, onConnect, onDisconnect) => {
-  const ws = new WebSocket(url(uri));
-
-  // In
-  ws.onmessage = (m) => {
-    const data = JSON.parse(m.data);
-    onMessage && onMessage(data);
-  };
-
-  ws.onopen = onConnect;
-
-  ws.onclose = onDisconnect;
-
-  // Expose connect function
-  return {
-    connect,
-    sendControlsChange: (data) => {
-      ws.send(JSON.stringify({ packet: "key", data: data }));
-    },
-    sendPlayerReady: (nickname) => {
-      ws.send(JSON.stringify({ packet: "ready", nickname: nickname }));
-    },
-  };
-};
-
-export default {
-  connect,
-};
+export { Network };

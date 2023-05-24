@@ -25,16 +25,24 @@ export async function Player(
   const loop = () => {
     if (ready && !g.iterate()) {
       // End condition
-      socket.send('{ "gameOver": true }');
+      try {
+        socket.send('{ "gameOver": true }');
+      } catch (e) {
+        console.error("Lost connection to client ...")
+      }
 
       // Write highscore
-      highscores.write({
-        nickname: g.Nickname,
-        score: g.Score,
-        level: g.Level,
-        lines: g.Lines,
-        ts: new Date(),
-      });
+      try {
+        highscores.write({
+          nickname: g.Nickname,
+          score: g.Score,
+          level: g.Level,
+          lines: g.Lines,
+          ts: new Date(),
+        });
+      } catch (e) {
+        console.error("Could not write highscores ...")
+      }
 
       // End game
       ready = false;

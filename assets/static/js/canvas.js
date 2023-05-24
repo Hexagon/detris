@@ -1,104 +1,62 @@
-// js/modules/dom/canvas.js
+class Canvas {
+  constructor() {
+    this.canvas = null;
+    this.context = null;
+    this.widthOffset = null;
+    this.heightOffset = null;
+  }
 
-const canvasFactory = function () {
-  // Private
-  var exports = {},
-    listeners = {},
-    canvas,
-    context,
-    widthOffset,
-    heightOffset,
-    emit = function (event, a1, a2, a3) {
-      listeners[event] && listeners[event](a1, a2, a3);
-    },
-    autoResize = function (e) {
-      canvas.width = window.innerWidth + (widthOffset || 0);
-      canvas.height = window.innerHeight + (heightOffset || 0);
-      emit("resize", {
-        width: canvas.width,
-        height: canvas.height,
-      });
-    };
+  getCanvas() {
+    return this.canvas;
+  }
 
-  // Public
-  exports.on = function (event, fn) {
-    if (listeners[event]) {
-      console.log(
-        "Warning: Dropping previous listener connected to '" + event +
-          "', only one listener is allowed.",
-      );
-      return;
-    }
+  getContext() {
+    return this.context;
+  }
 
-    listeners[event] = fn;
-  };
-
-  exports.getCanvas = function () {
-    return canvas;
-  };
-
-  exports.getContext = function () {
-    return context;
-  };
-
-  exports.place = function (
-    destinationSelector,
-    id,
-    width,
-    height,
-    _widthOffset,
-    _heightOffset,
-  ) {
-    var destination;
+  place(destinationSelector, id, width, height, _widthOffset, _heightOffset) {
 
     // Find destination element
-    destination = document.querySelector(destinationSelector);
+    const destination = document.querySelector(destinationSelector);
     if (!destination) {
       console.error("Destination not found");
       return false;
     }
 
     // Create canvas
-    canvas = document.createElement("canvas");
-    canvas.id = id;
+    this.canvas = document.createElement("canvas");
+    this.canvas.id = id;
 
     // Place canvas at destination
     try {
-      destination.appendChild(canvas);
+      destination.appendChild(this.canvas);
     } catch (e) {
       console.error("Could not place canvas in destination:", e);
       return false;
     }
 
     // Get a 2d context
-    context = canvas.getContext("2d");
+    this.context = this.canvas.getContext("2d");
 
-    //
-    widthOffset = _widthOffset;
-    heightOffset = _heightOffset;
+    this.widthOffset = _widthOffset;
+    this.heightOffset = _heightOffset;
 
-    // Listen for resize events
+    // Set canvas size
     if (!width && !height) {
-      window.addEventListener("resize", autoResize);
-      // Call resize one initial time
-      autoResize();
+      this.autoResize();
     } else {
-      canvas.width = width + (widthOffset || 0);
-      canvas.height = height + (heightOffset || 0);
-      setTimeout(
-        emit("resize", {
-          width: canvas.width,
-          height: canvas.height,
-        }),
-        10,
-      );
+      this.canvas.width = width + (this.widthOffset || 0);
+      this.canvas.height = height + (this.heightOffset || 0);
     }
 
     // All good!
     return true;
-  };
+  }
 
-  return exports;
-};
+  autoResize() {
+    this.canvas.width = window.innerWidth + (this.widthOffset || 0);
+    this.canvas.height = window.innerHeight + (this.heightOffset || 0);
+  }
+}
 
-export { canvasFactory };
+export { Canvas };

@@ -5,7 +5,6 @@
  */
 
 import { htmlEscape } from "./utils.js";
-import viewport from "./viewport.js";
 
 // Define all screens and elements
 const elements = {
@@ -62,7 +61,6 @@ const initializers = {
     });
   },
   game: () => {
-    viewport.create();
   },
 };
 

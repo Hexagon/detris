@@ -1,6 +1,4 @@
-import viewport from "./viewport.js";
-import controls from "./controls.js";
-import network from "./network.js";
+
 
 export class Game {
   constructor() {
@@ -20,46 +18,24 @@ export class Game {
     this.server = null;
   }
 
-  async setup(nickname, control) {
-    const self = this;
-    const done = new Promise(function (resolve, reject) {
-      const timeout = setTimeout(() => {
-        reject(new Error("Connection timeout"));
-      }, 10000);
+  getData() { return this.data }
+  getGrid() { return this.data }
+  getPlaying() { return this.data }
+  
+  setData(d) {
+    this.data = d
+  }
 
-      // Connect to the server
-      self.server = network.connect(
-        "/ws",
-        /* onMessage */
-        (o) => {
-          if (o.Position) {
-            self.data = o;
-          } else if (o.Data) {
-            self.grid = o;
-          } else if (o.gameOver) {
-            self.playing = false;
-            self.gameOver && self.gameOver();
-          }
-          viewport.redraw(self);
-        },
-        /* onConnect */
-        () => {
-          clearTimeout(timeout);
-          self.server.sendPlayerReady(nickname);
-          resolve();
-        },
-        /* onDisconnect */
-        () => {
-        },
-      );
+  setGrid(g) {
+    this.grid = g
+  }
 
-      // Attach controls
-      control.setHandleChange((c) => {
-        self.server.sendControlsChange(c);
-      });
-    });
+  setPlaying(p) {
+    this.playing = p
+  }
 
-    return await done;
+  setGameOver() {
+    this.gameOver && this.gameOver()
   }
 
   async play() {
@@ -69,10 +45,6 @@ export class Game {
     return await gamePromise;
   }
 
-  cleanup() {
-    // Clean up any resources, event listeners, etc.
-    network.disconnect();
-  }
 }
 
 export default Game;
