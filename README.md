@@ -5,6 +5,8 @@ TypeScript. It utilizes Deno KV for storage and includes a basic HTML5 client
 for gameplay. This client is lazy, which means all calculations are made
 server-side.
 
+Live at [https://tetris.56k.guru](https://tetris.56k.guru)
+
 To set up the development environment, follow the steps below:
 
 1. Clone this repository to your desired workspace:

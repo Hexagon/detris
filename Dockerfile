@@ -7,14 +7,6 @@ EXPOSE 8080
 # Set the working directory in the Docker image
 WORKDIR /app
 
-# Use `deno` as the user to run this Docker image
-USER deno
-
-# Cache the dependencies
-# This step is rerun only when `deps.ts` is modified
-COPY deps.ts .
-RUN deno cache deps.ts
-
 # Add the rest of the source code files
 ADD . .
 
@@ -22,4 +14,4 @@ ADD . .
 RUN deno cache main.ts
 
 # Run your application
-CMD ["run", "--allow-net", "--allow-env", "--unstable", "main.ts"]
+CMD ["run", "--allow-read", "--allow-write", "--allow-net", "--allow-env", "--unstable", "main.ts"]
