@@ -30,7 +30,7 @@ http://127.0.0.1:8080
 
 ## Available Environment Variables
 
-| Variable    | Default |
-| ----------- | ------- |
-| DETRIS_PORT | 8080    |
+| Variable            | Default               |
+| ------------------- | --------------------- |
+| DETRIS_PORT         | 8080                  |
 | DETRIS_PERSIST_PATH | <default kv location> |

@@ -1,5 +1,3 @@
-
-
 export class Game {
   constructor() {
     this.colors = {
@@ -18,24 +16,30 @@ export class Game {
     this.server = null;
   }
 
-  getData() { return this.data }
-  getGrid() { return this.data }
-  getPlaying() { return this.data }
-  
+  getData() {
+    return this.data;
+  }
+  getGrid() {
+    return this.data;
+  }
+  getPlaying() {
+    return this.data;
+  }
+
   setData(d) {
-    this.data = d
+    this.data = d;
   }
 
   setGrid(g) {
-    this.grid = g
+    this.grid = g;
   }
 
   setPlaying(p) {
-    this.playing = p
+    this.playing = p;
   }
 
   setGameOver() {
-    this.gameOver && this.gameOver()
+    this.gameOver && this.gameOver();
   }
 
   async play() {
@@ -44,7 +48,6 @@ export class Game {
     });
     return await gamePromise;
   }
-
 }
 
 export default Game;

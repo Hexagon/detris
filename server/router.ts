@@ -1,4 +1,4 @@
-import { read, readPlaying } from "../highscores/highscores.ts";
+import { read, readPlaying, readToday } from "../highscores/highscores.ts";
 
 const routes = [
   {
@@ -27,6 +27,19 @@ const routes = [
       });
     },
   },
+  {
+    pattern: new URLPattern({ pathname: "/api/today" }),
+    handler: async function (_req: Request): Promise<Response> {
+      // Read highscores
+      const response = await readToday();
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+        },
+      });
+    },
+  }
   // You can add more routes here...
 ];
 

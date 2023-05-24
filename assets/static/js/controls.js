@@ -1,5 +1,4 @@
 class Controls {
-  
   #handleChange = null;
 
   constructor() {
@@ -47,8 +46,12 @@ class Controls {
   }
 
   #initialize() {
-    window.addEventListener("keydown", (e) => { this.#handleKeyDown(e) });
-    window.addEventListener("keyup", (e) => { this.#handleKeyUp(e) });
+    window.addEventListener("keydown", (e) => {
+      this.#handleKeyDown(e);
+    });
+    window.addEventListener("keyup", (e) => {
+      this.#handleKeyUp(e);
+    });
   }
 
   setHandleChange(callback) {

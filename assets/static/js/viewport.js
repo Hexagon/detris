@@ -3,9 +3,8 @@ import { Canvas } from "./canvas.js";
 
 class Viewport {
   constructor(destinationElmId, gf, width, height) {
-
     this.game = null;
-    
+
     // Create new canvas
     this.canvas = new Canvas();
 
@@ -31,16 +30,16 @@ class Viewport {
   #drawBackground() {
     const { context, dimensions } = this;
     context.fillStyle = "rgb(64,64,64)";
-    context.fillRect(190, 10, 220, dimensions.height - 60);
+    context.fillRect(90, 10, 220, dimensions.height - 60);
 
     context.fillStyle = "rgb(32,32,32)";
-    context.fillRect(195, 15, 210, dimensions.height - 70);
+    context.fillRect(95, 15, 210, dimensions.height - 70);
   }
 
   #drawHider() {
     const { context } = this;
     // Create gradient
-    const grd = context.createLinearGradient(195, 15, 225, 30);
+    const grd = context.createLinearGradient(95, 15, 225, 30);
     grd.addColorStop(0, "rgb(8,8,8)");
     grd.addColorStop(0.8, "rgba(32,32,32,0)");
 
@@ -59,11 +58,18 @@ class Viewport {
 
       // Destination position in pixels
       if (dy + currentSprite.Y > 1) {
-        const px = 200 + (dx + currentSprite.X) * 20;
+        const px = 100 + (dx + currentSprite.X) * 20;
         const py = 20 + (dy + currentSprite.Y - 2) * 20;
 
         // Create gradient
-        const grd = context.createRadialGradient(px + 10, py + 10, 0, px + 10, py + 10, 50);
+        const grd = context.createRadialGradient(
+          px + 10,
+          py + 10,
+          0,
+          px + 10,
+          py + 10,
+          50,
+        );
         grd.addColorStop(0, game.colors[tetromino.Type]);
         grd.addColorStop(1, "rgb(0,0,0)");
 
@@ -91,11 +97,18 @@ class Viewport {
         for (let x = 0; x < 10; x++) {
           // First two rows are hidden
           if (y > 1 && data[x + y * 10]) {
-            const px = 200 + x * 20;
+            const px = 100 + x * 20;
             const py = 20 + (y - 2) * 20;
 
             // Create gradient
-            const grd = context.createRadialGradient(px + 10, py + 10, 0, px + 10, py + 10, 50);
+            const grd = context.createRadialGradient(
+              px + 10,
+              py + 10,
+              0,
+              px + 10,
+              py + 10,
+              50,
+            );
             grd.addColorStop(0, game.colors[data[x + y * 10]]);
             grd.addColorStop(1, "rgb(0,0,0)");
 
@@ -112,7 +125,6 @@ class Viewport {
     if (this.game && this.game.data && this.context) {
       const { context, dimensions, game } = this;
       if (game.playing) {
-        
         context.clearRect(0, 0, dimensions.width, dimensions.height);
 
         this.#drawBackground();
@@ -121,13 +133,13 @@ class Viewport {
         this.#drawTetromino(
           game.data.Position,
           game.data.Rotation,
-          game.data.Tetrominoes[0]
+          game.data.Tetrominoes[0],
         );
         this.#drawTetromino(
           game.data.GhostPosition,
           game.data.Rotation,
           game.data.Tetrominoes[0],
-          true
+          true,
         );
 
         this.#drawHider();
@@ -135,28 +147,46 @@ class Viewport {
         context.font = "200 16px Raleway";
         context.fillStyle = "rgb(196,196,196)";
 
-        context.fillText("QUEUE", 105, 50);
-        context.fillText("SCORE", 450, 50);
-        context.fillText("LEVEL", 450, 120);
-        context.fillText("LINES", 450, 190);
+        context.fillText("QUEUE", 5, 50);
+        context.fillText("SCORE", 350, 50);
+        context.fillText("LEVEL", 350, 120);
+        context.fillText("LINES", 350, 190);
 
         context.font = "200 24px Raleway";
 
-        context.fillText(game.data.Score, 450, 80);
-        context.fillText(game.data.Level, 450, 150);
-        context.fillText(game.data.Lines, 450, 220);
+        context.fillText(game.data.Score, 350, 80);
+        context.fillText(game.data.Level, 350, 150);
+        context.fillText(game.data.Lines, 350, 220);
 
         context.save();
         context.globalAlpha = 0.8;
-        this.#drawTetromino({ X: -5, Y: 5 }, 0, game.data.Tetrominoes[1], false, true);
+        this.#drawTetromino(
+          { X: -5, Y: 5 },
+          0,
+          game.data.Tetrominoes[1],
+          false,
+          true,
+        );
         context.restore();
         context.save();
         context.globalAlpha = 0.6;
-        this.#drawTetromino({ X: -5, Y: 8 }, 0, game.data.Tetrominoes[2], false, true);
+        this.#drawTetromino(
+          { X: -5, Y: 8 },
+          0,
+          game.data.Tetrominoes[2],
+          false,
+          true,
+        );
         context.restore();
         context.save();
         context.globalAlpha = 0.4;
-        this.#drawTetromino({ X: -5, Y: 11 }, 0, game.data.Tetrominoes[3], false, true);
+        this.#drawTetromino(
+          { X: -5, Y: 11 },
+          0,
+          game.data.Tetrominoes[3],
+          false,
+          true,
+        );
         context.restore();
       }
     }

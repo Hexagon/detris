@@ -18,6 +18,10 @@ interface HighscoreMessageNow {
   now: number;
 }
 
+interface HighscoreMessageToday {
+  playing: Highscore[];
+  now: number;
+}
 
 const kv = await Deno.openKv(Deno.env.get("DETRIS_PERSIST_PATH"));
 
@@ -58,10 +62,15 @@ export async function readPlaying(): Promise<HighscoreMessageNow | null> {
   const playing: Highscore[] = [];
 
   // 1 week before now
-  const oneDayBefore = Date.now()-24*60*60*1_000,
+  const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000,
     tenSecondsBefore = new Date(Date.now() - 10_000);
 
-  for await (const entry of kv.list({ start: ["highscores", oneDayBefore], end: ["highscores", Date.now()+1] })) {
+  for await (
+    const entry of kv.list({
+      start: ["highscores", oneDayBefore],
+      end: ["highscores", Date.now() + 1],
+    })
+  ) {
     const hs: Highscore = entry.value as Highscore;
     if (hs.ts >= tenSecondsBefore) {
       playing.push(hs);
@@ -71,4 +80,25 @@ export async function readPlaying(): Promise<HighscoreMessageNow | null> {
   playing.sort((a, b) => b.score - a.score);
 
   return { playing: playing.slice(0, 9), now: Date.now() };
+}
+
+export async function readToday(): Promise<HighscoreMessageToday | null> {
+  const today: Highscore[] = [];
+
+  // 1 week before now
+  const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000;
+
+  for await (
+    const entry of kv.list({
+      start: ["highscores", oneDayBefore],
+      end: ["highscores", Date.now() + 1],
+    })
+  ) {
+    const hs: Highscore = entry.value as Highscore;
+    today.push(hs);
+  }
+
+  today.sort((a, b) => b.score - a.score);
+
+  return { today: today.slice(0, 9), now: Date.now() };
 }

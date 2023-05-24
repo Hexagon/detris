@@ -15,7 +15,6 @@ class Canvas {
   }
 
   place(destinationSelector, id, width, height, _widthOffset, _heightOffset) {
-
     // Find destination element
     const destination = document.querySelector(destinationSelector);
     if (!destination) {

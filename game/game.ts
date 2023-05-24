@@ -170,12 +170,12 @@ export class Game {
       // Reset timer
       this.timerReal = new Date();
       this.timerModified = new Date();
-  
+
       if (!this.moveDown()) {
         return this.lockdown();
       }
     }
-  
+
     return true;
   }
 

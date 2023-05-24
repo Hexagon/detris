@@ -7,17 +7,16 @@ class Network {
   #url(s) {
     const l = window.location;
     const dir = l.pathname.substring(0, l.pathname.lastIndexOf("/"));
-  
+
     return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + dir + s;
   }
 
   async connect(uri, messageCallback, connectCallback, disconnectCallback) {
-
     // Set up promise
     let resolver;
     const done = new Promise((resolve) => {
-      resolver = resolve
-    })
+      resolver = resolve;
+    });
 
     this.ws = new WebSocket(this.#url(uri));
 
@@ -30,11 +29,11 @@ class Network {
     this.ws.onopen = () => {
       resolver();
       connectCallback;
-    }
+    };
 
     this.ws.onclose = disconnectCallback;
 
-    return await done
+    return await done;
   }
 
   sendControlsChange(data) {
