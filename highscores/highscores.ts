@@ -19,7 +19,7 @@ interface HighscoreMessageNow {
 }
 
 interface HighscoreMessageToday {
-  playing: Highscore[];
+  today: Highscore[];
   now: number;
 }
 
@@ -91,7 +91,7 @@ export async function readToday(): Promise<HighscoreMessageToday | null> {
   for await (
     const entry of kv.list({
       start: ["highscores", oneDayBefore],
-      end: ["highscores", Date.now() + 1],
+      end: ["highscores", Date.now() + 24 * 60 * 60 * 1_000],
     })
   ) {
     const hs: Highscore = entry.value as Highscore;
