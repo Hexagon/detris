@@ -32,7 +32,7 @@ export async function Player(
 
     if (ready) {
       // Update score in database
-      if (g.Score != lastWriteScore) {
+      if (g.Score > lastWriteScore) {
         lastWriteScore = g.Score;
         highscores.write({
           nickname: g.Nickname,
