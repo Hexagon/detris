@@ -23,7 +23,6 @@ export async function Player(
   let ready = false;
 
   const loop = () => {
-
     if (ready) {
       // Update score in database
       if (g.Score >= g.lastWriteScore) {
@@ -37,7 +36,7 @@ export async function Player(
           tsInit: g.initializationTime,
         });
       }
-      
+
       // Check for end condition
       if (!g.iterate()) {
         // End condition

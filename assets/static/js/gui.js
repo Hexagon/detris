@@ -29,7 +29,7 @@ const elements = {
     hsYourScore: document.getElementById("hsYourScore"),
     hsAllTime: document.getElementById("hsAllTime"),
     hsLast7Days: document.getElementById("hsLast7Days"),
-    hsToday: document.getElementById("hsToday")
+    hsToday: document.getElementById("hsToday"),
   },
 };
 
@@ -209,4 +209,4 @@ for (const screenName of Object.keys(elements.screens)) {
   if (initializers[screenName]) initializers[screenName]();
 }
 
-export { onScreenEvent, showScreen, elements };
+export { elements, onScreenEvent, showScreen };

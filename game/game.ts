@@ -34,8 +34,8 @@ export class Game {
 
   timerReal: Date;
   timerModified: Date;
-initializationTime: number;
-lastWriteScore: number;
+  initializationTime: number;
+  lastWriteScore: number;
 
   constructor(nickname: string, socket: WebSocket) {
     this.grid = new GameGrid(); // Assuming GameGrid has a default constructor
@@ -65,13 +65,12 @@ lastWriteScore: number;
     this.nextTetromino(); // Assuming nextTetromino is a method of Game class
     // Initial game update
     this.safeSocketSend(this.updateGrid()); // Assuming updateGrid is a method of Game class
-    
+
     // Used as the highscore key
     this.initializationTime = Date.now();
 
     // Keep track of last write to db
     this.lastWriteScore = -1;
-    
   }
 
   safeSocketSend(m: unknown) {

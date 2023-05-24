@@ -39,7 +39,7 @@ const routes = [
         },
       });
     },
-  }
+  },
   // You can add more routes here...
 ];
 

@@ -6,7 +6,7 @@
 import { Viewport } from "./viewport.js";
 import { Network } from "./network.js";
 import { Controls } from "./controls.js";
-import { onScreenEvent, showScreen, elements } from "./gui.js";
+import { elements, onScreenEvent, showScreen } from "./gui.js";
 import { Game } from "./game.js";
 import { htmlEscape } from "./utils.js";
 
@@ -67,11 +67,10 @@ const updateLiveHighscore = () => {
       }
 
       elements.containers.hsToday.innerHTML = html;
-
     }
-  }
+  };
   xhr.send();
-}
+};
 
 // Function which starts a new game
 const newGame = async (nickname) => {
@@ -82,15 +81,15 @@ const newGame = async (nickname) => {
   network.sendPlayerReady(nickname);
 
   // Start highscore updater
-  const updateHsTimer = setInterval(updateLiveHighscore, 5_000)
-  updateLiveHighscore()
-  
+  const updateHsTimer = setInterval(updateLiveHighscore, 5_000);
+  updateLiveHighscore();
+
   // Start playing
   showScreen("game");
   try {
     await currentGame.play();
   } catch (_e) {
-    console.error("An error occurred while playing.")
+    console.error("An error occurred while playing.");
   } finally {
     // Stop highscore updater
     clearInterval(updateHsTimer);
