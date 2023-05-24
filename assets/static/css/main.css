@@ -139,3 +139,7 @@ html {
 .justify-content-center {
   justify-content: center;
 }
+
+.playing {
+  color: #99EE99;
+}

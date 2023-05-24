@@ -234,7 +234,7 @@ export class Game {
       bogusPosition.Y += 1;
     }
 
-    this.addScore(dropOffset * 2, false);
+    this.addScore(dropOffset * 2, true);
 
     this.lockdown();
   }

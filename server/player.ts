@@ -19,29 +19,37 @@ export async function Player(
 ) {
   let g: Game;
 
+  // Used as the highscore key
+  const initializationTime = Date.now()
+
+  // Keep track of last write to db
+  let lastWriteScore = -1
+
   // Player is not ready yet!
   let ready = false;
 
   const loop = () => {
+
+    // Update score in database
+    if (g.Score != lastWriteScore) {
+      lastWriteScore = g.Score
+      highscores.write({
+        nickname: g.Nickname,
+        score: g.Score,
+        level: g.Level,
+        lines: g.Lines,
+        ts: new Date(),
+        tsInit: initializationTime
+      });
+    }
+
+    // Check for end condition
     if (ready && !g.iterate()) {
       // End condition
       try {
         socket.send('{ "gameOver": true }');
       } catch (e) {
         console.error("Lost connection to client ...")
-      }
-
-      // Write highscore
-      try {
-        highscores.write({
-          nickname: g.Nickname,
-          score: g.Score,
-          level: g.Level,
-          lines: g.Lines,
-          ts: new Date(),
-        });
-      } catch (e) {
-        console.error("Could not write highscores ...")
       }
 
       // End game

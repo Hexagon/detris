@@ -78,9 +78,10 @@ const updaters = {
         const max = 10;
         if (res.ath) {
           res.ath.forEach(function (hs) {
+            const playingClass = (Date.parse(hs.ts) > Date.now() - 10_000) ? " playing" : ""
             if (current++ < max) {
               html +=
-                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                '<div class="highscore-entry' + playingClass + '"><h5 class="right no-margin">' +
                 htmlEscape(hs.score) +
                 '</h5><h5 class="no-margin">' +
                 htmlEscape(hs.nickname) +
@@ -97,8 +98,10 @@ const updaters = {
         if (res.week) {
           res.week.forEach(function (hs) {
             if (current++ < max) {
+              
+              const playingClass = (Date.parse(hs.ts) > Date.now() - 10_000) ? " playing" : ""
               html +=
-                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                '<div class="highscore-entry' + playingClass+ '"><h5 class="right no-margin">' +
                 htmlEscape(hs.score) +
                 '</h5><h5 class="no-margin">' +
                 htmlEscape(hs.nickname) +

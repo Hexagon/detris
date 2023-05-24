@@ -111,9 +111,10 @@ class Viewport {
     this.game = gameData;
     if (this.game && this.game.data && this.context) {
       const { context, dimensions, game } = this;
-      context.clearRect(0, 0, dimensions.width, dimensions.height);
-
       if (game.playing) {
+        
+        context.clearRect(0, 0, dimensions.width, dimensions.height);
+
         this.#drawBackground();
         this.#drawData();
 
@@ -157,26 +158,6 @@ class Viewport {
         context.globalAlpha = 0.4;
         this.#drawTetromino({ X: -5, Y: 11 }, 0, game.data.Tetrominoes[3], false, true);
         context.restore();
-      } else {
-        this.#drawBackground();
-        this.#drawData();
-
-        // Draw overlay
-        context.fillStyle = "rgba(0,0,0,0.8)";
-        context.fillRect(0, 0, dimensions.width, dimensions.height);
-
-        context.font = "80px Raleway";
-        context.textAlign = "center";
-
-        context.fillStyle = "rgb(196,196,196)";
-        context.fillText("GAME OVER", dimensions.width / 2, 160);
-
-        context.font = "20px Raleway";
-        context.fillStyle = "rgb(255,255,255)";
-        context.fillText("Final score", dimensions.width / 2, 250);
-
-        context.font = "60px Raleway";
-        context.fillText(game.data.Score, dimensions.width / 2, 320);
       }
     }
   }
