@@ -11,7 +11,7 @@ interface HighscoreMessage {
   week: Highscore[];
 }
 
-const kv = await Deno.openKv();
+const kv = await Deno.openKv(Deno.env.get("DETRIS_PERSIST_PATH"));
 
 export async function write(h: Highscore): Promise<boolean> {
   try {
