@@ -19,12 +19,6 @@ export async function Player(
 ) {
   let g: Game;
 
-  // Used as the highscore key
-  const initializationTime = Date.now();
-
-  // Keep track of last write to db
-  let lastWriteScore = -1;
-
   // Player is not ready yet!
   let ready = false;
 
@@ -32,15 +26,15 @@ export async function Player(
 
     if (ready) {
       // Update score in database
-      if (g.Score > lastWriteScore) {
-        lastWriteScore = g.Score;
+      if (g.Score >= g.lastWriteScore) {
+        g.lastWriteScore = g.Score;
         highscores.write({
           nickname: g.Nickname,
           score: g.Score,
           level: g.Level,
           lines: g.Lines,
           ts: new Date(),
-          tsInit: initializationTime,
+          tsInit: g.initializationTime,
         });
       }
       
