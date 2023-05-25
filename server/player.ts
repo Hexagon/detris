@@ -23,7 +23,7 @@ class Player {
   // Player is not ready yet!
   private ready = false;
 
-  constructor(socket: WebSocket, kv: Deno.Kv) {
+  constructor(socket: WebSocket) {
     this.g = null;
     this.state = this.constructState(null);
 
@@ -53,15 +53,15 @@ class Player {
       }
     };
 
-    this.socket.addEventListener("open", async () => {
+    this.socket.addEventListener("open", () => {
       // Register player
       console.log("A client connected!");
 
       // Give the user a unique id
-      const uuid = crypto.randomUUID();
+      // const uuid = crypto.randomUUID();
 
       // Store user in kv
-      await kv.set(["status", uuid], { status: "connected", ts: new Date() });
+      // await kv.set(["status", uuid], { status: "connected", ts: new Date() });
     });
 
     // Handle incoming messages

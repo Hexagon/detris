@@ -4,7 +4,7 @@
  * @file static/js/viewports/singleplayer.js
  */
 
-import { Canvas } from "../canvas.js";
+import { Canvas } from "../common/canvas.js";
 
 class Viewport {
   constructor(destinationElmId, gf, width, height) {

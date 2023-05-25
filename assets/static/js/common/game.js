@@ -1,7 +1,9 @@
 /**
- * Keeps track of the state of the current game
+ * Keeps track of the state of the current game regardless of mode
  *
- * @file static/js/game.js
+ * And for some unknown reason, the colors of the tetrominos is defined here.
+ *
+ * @file static/js/common/game.js
  */
 
 export class Game {

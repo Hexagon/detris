@@ -1,7 +1,7 @@
 /**
  * Wrapper for the viewport canvas element
  *
- * @file static/js/canvas.js
+ * @file static/js/common/canvas.js
  */
 
 class Canvas {

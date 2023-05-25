@@ -1,6 +1,12 @@
+/**
+ * Manages single player game mode
+ *
+ * @file static/js/modes/singleplayer.js
+ */
+
 import { Viewport } from "../viewports/singleplayer.js";
 import { elements, showScreen } from "../gui.js";
-import { Game } from "../game.js";
+import { Game } from "../common/game.js";
 import { htmlEscape } from "../utils.js";
 
 let viewport;
