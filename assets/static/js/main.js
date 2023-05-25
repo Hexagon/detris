@@ -11,8 +11,8 @@ import { elements, onScreenEvent, showScreen } from "./gui.js";
 import { Game } from "./game.js";
 import { htmlEscape } from "./utils.js";
 
-// Set up viewport
-const viewport = new Viewport("#game", "gf", 400, 480);
+// Prepare viewport
+let viewport;
 
 // Set up game
 let currentGame = undefined;
@@ -68,7 +68,7 @@ const updateLiveHighscore = () => {
         });
       }
 
-      elements.containers.hsToday.innerHTML = html;
+      elements.containers.hsSingleplayerToday.innerHTML = html;
     }
   };
   xhr.send();
@@ -77,8 +77,11 @@ const updateLiveHighscore = () => {
 };
 
 // Function which starts a new game
-const newGame = async (nickname) => {
+const newSingleplayerGame = async (nickname) => {
   showScreen("loading");
+
+  // Set up viewport
+  viewport = new Viewport("#game", "gf", 400, 480);
 
   // New game
   currentGame = new Game();
@@ -88,7 +91,7 @@ const newGame = async (nickname) => {
   updateLiveHighscore();
 
   // Start playing
-  showScreen("game");
+  showScreen("singleplayergame");
   try {
     await currentGame.play();
   } catch (_e) {
@@ -100,7 +103,7 @@ const newGame = async (nickname) => {
 
   // Get score
   if (currentGame.getState().Score > 0) {
-    showScreen("highscore", currentGame.getState().Score);
+    showScreen("singleplayerhighscore", currentGame.getState().Score);
   } else {
     showScreen("aborted");
   }
@@ -109,15 +112,58 @@ const newGame = async (nickname) => {
   currentGame = null;
 };
 
-onScreenEvent("login", "done", newGame);
+// Function which starts a new game
+const newCoopGame = async (nickname) => {
+  showScreen("loading");
 
-onScreenEvent("highscore", "newgame", newGame);
+  // Set up viewport
+  viewport = new Viewport("#game", "gf", 640, 480);
 
-onScreenEvent("aborted", "ok", () => {
-  showScreen("login");
+  // New game
+  currentGame = new Game();
+  network.sendPlayerReady(nickname);
+
+  // Start playing
+  showScreen("coopgame");
+  try {
+    await currentGame.play();
+  } catch (_e) {
+    console.error("An error occurred while playing.");
+  }
+
+  // Get score
+  if (currentGame.getState().Score > 0) {
+    showScreen("coophighscore", currentGame.getState().Score);
+  } else {
+    showScreen("aborted");
+  }
+
+  // Reset game
+  currentGame = null;
+};
+
+onScreenEvent("singleplayer", "done", newSingleplayerGame);
+onScreenEvent("singleplayerhighscore", "newgame", newSingleplayerGame);
+onScreenEvent(
+  "singleplayerhighscore",
+  "mainmenu",
+  () => showScreen("modeselect"),
+);
+
+onScreenEvent("coop", "done", newCoopGame);
+onScreenEvent("coophighscore", "mainmenu", () => showScreen("modeselect"));
+
+onScreenEvent("modeselect", "done", (mode) => {
+  if (mode === "singleplayer") {
+    showScreen("singleplayer");
+  } else if (mode === "coop") {
+    showScreen("coop");
+  }
 });
 
-// Show login screen after 1 second
-setTimeout(() => {
-  showScreen("login");
-}, 1000);
+onScreenEvent("aborted", "ok", () => {
+  showScreen("modeselect");
+});
+
+// Show mode select screen
+showScreen("modeselect");

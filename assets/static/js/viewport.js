@@ -33,10 +33,10 @@ class Viewport {
   #drawBackground() {
     const { context, dimensions } = this;
     context.fillStyle = "rgb(64,64,64)";
-    context.fillRect(90, 10, 220, dimensions.height - 60);
+    context.fillRect(80, 10, 220, dimensions.height - 60);
 
     context.fillStyle = "rgb(32,32,32)";
-    context.fillRect(95, 15, 210, dimensions.height - 70);
+    context.fillRect(85, 15, 210, dimensions.height - 70);
   }
 
   #drawHider() {
@@ -47,7 +47,7 @@ class Viewport {
     grd.addColorStop(0.8, "rgba(32,32,32,0)");
 
     context.fillStyle = grd;
-    context.fillRect(195, 15, 210, 30);
+    context.fillRect(175, 15, 210, 30);
   }
 
   #drawTetromino(position, rotation, tetromino, ghost, game) {
@@ -61,7 +61,7 @@ class Viewport {
 
       // Destination position in pixels
       if (dy + currentSprite.Y > 1) {
-        const px = 100 + (dx + currentSprite.X) * 20;
+        const px = 90 + (dx + currentSprite.X) * 20;
         const py = 20 + (dy + currentSprite.Y - 2) * 20;
 
         // Create gradient
@@ -100,7 +100,7 @@ class Viewport {
         for (let x = 0; x < 10; x++) {
           // First two rows are hidden
           if (y > 1 && data[x + y * 10]) {
-            const px = 100 + x * 20;
+            const px = 90 + x * 20;
             const py = 20 + (y - 2) * 20;
 
             // Create gradient
@@ -153,17 +153,17 @@ class Viewport {
         context.font = "200 16px Raleway";
         context.fillStyle = "rgb(196,196,196)";
 
-        context.fillText("QUEUE", 5, 50);
-        context.fillText("SCORE", 350, 50);
-        context.fillText("LEVEL", 350, 120);
-        context.fillText("LINES", 350, 190);
+        context.fillText("QUEUE", 0, 50);
+        context.fillText("SCORE", 330, 50);
+        context.fillText("LEVEL", 330, 120);
+        context.fillText("LINES", 330, 190);
 
         context.font = "200 24px Raleway";
 
         // ToDo: Get from player insted
-        context.fillText(game.state?.Score || "0", 350, 80);
-        context.fillText(game.data?.Level || "0", 350, 150);
-        context.fillText(game.data?.Lines || "0", 350, 220);
+        context.fillText(game.state?.Score || "0", 330, 80);
+        context.fillText(game.data?.Level || "0", 330, 150);
+        context.fillText(game.data?.Lines || "0", 330, 220);
 
         context.save();
         context.globalAlpha = 0.8;

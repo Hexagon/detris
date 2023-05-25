@@ -126,8 +126,8 @@ class Player {
       Level: 0,
       Lines: 0,
       GameId: id,
-      GameConnected: new Date().getTime(),
-      Updated: new Date().getTime(),
+      GameConnected: Date.now(),
+      Updated: Date.now(),
       Winner: null,
     };
   }
@@ -141,16 +141,19 @@ class Player {
 
   public addScore(newScore: number) {
     this.state.Score += newScore;
+    this.state.Updated = Date.now();
     this.writeHighscore();
     this.sendMessage(JSON.stringify(this.state));
   }
   public setLines(newLines: number) {
     this.state.Lines = newLines;
+    this.state.Updated = Date.now();
     this.writeHighscore();
     this.sendMessage(JSON.stringify(this.state));
   }
   public setLevel(newLevel: number) {
     this.state.Level = newLevel;
+    this.state.Updated = Date.now();
     this.writeHighscore();
     this.sendMessage(JSON.stringify(this.state));
   }

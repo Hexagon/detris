@@ -9,65 +9,118 @@ import { htmlEscape } from "./utils.js";
 // Define all screens and elements
 const elements = {
   screens: {
-    login: document.getElementById("viewMenu"),
-    game: document.getElementById("viewGame"),
-    highscore: document.getElementById("viewHighscore"),
+    modeselect: document.getElementById("viewModeselect"),
+
+    singleplayer: document.getElementById("viewSingleplayer"),
+    singleplayergame: document.getElementById("viewSingleplayerGame"),
+    singleplayerhighscore: document.getElementById("viewSingleplayerHighscore"),
+
+    coop: document.getElementById("viewCoop"),
+    coopgame: document.getElementById("viewCoopGame"),
+    coophighscore: document.getElementById("viewCoopHighscore"),
+
     loading: document.getElementById("viewLoading"),
     aborted: document.getElementById("viewAborted"),
   },
   inputs: {
-    nickname: document.getElementById("txtNickname"),
+    singleplayernickname: document.getElementById("txtSingleplayerNickname"),
+    coopnickname: document.getElementById("txtCoopNickname"),
   },
   buttons: {
-    start: document.getElementById("btnStart"),
-    newGame: document.getElementById("btnNewGame"),
+    singleplayer: document.getElementById("btnSingleplayer"),
+    singleplayerstart: document.getElementById("btnSingleplayerStart"),
+    singleplayernewgame: document.getElementById("btnSingleplayerNewGame"),
+    singleplayermainmenu: document.getElementById("btnSingleplayerMainMenu"),
+
+    coop: document.getElementById("btnCoop"),
+    coopstart: document.getElementById("btnCoopStart"),
+    coopmainmenu: document.getElementById("btnCoopMainMenu"),
   },
   containers: {
-    hsAth: document.getElementById("hsAth"),
-    hsWeek: document.getElementById("hsWeek"),
-    message: document.getElementById("message"),
-    hsYourScore: document.getElementById("hsYourScore"),
-    hsAllTime: document.getElementById("hsAllTime"),
-    hsLast7Days: document.getElementById("hsLast7Days"),
-    hsToday: document.getElementById("hsToday"),
+    /* Single player menu view */
+    hsSingleplayerAth: document.getElementById("hsSingleplayerAth"),
+    hsSingleplayerWeek: document.getElementById("hsSingleplayerWeek"),
+    hsSingleplayerToday: document.getElementById("hsSingleplayerToday"),
+
+    /* Co-op menu view */
+    hsCoopAth: document.getElementById("hsCoopAth"),
+    hsCoopWeek: document.getElementById("hsCoopWeek"),
+    hsCoopToday: document.getElementById("hsCoopToday"),
+
+    /* Single player highscore view */
+    hsSingleplayerYourScore: document.getElementById("hsSingleplayerYourScore"),
+    hsSingleplayerAllTime: document.getElementById("hsSingleplayerAllTime"),
+    hsSingleplayerLast7Days: document.getElementById("hsSingleplayerLast7Days"),
+
+    /* Co-op highscore view */
+    hsCoopYourScore: document.getElementById("hsCoopYourScore"),
+    hsCoopAllTime: document.getElementById("hsSingleplayerAllTime"),
+    hsCoopLast7Days: document.getElementById("hsSingleplayerLast7Days"),
   },
 };
 
-const events = {
-  login: {
-    done: () => {},
-    show: () => {},
-  },
-  highscore: {
-    show: () => {},
-    newgame: () => {},
-  },
-};
+const events = {};
 
 // Define initializers for each screen
 const initializers = {
-  login: () => {
-    elements.inputs.nickname.addEventListener("keydown", function (e) {
+  modeselect: () => {
+    elements.buttons.singleplayer.addEventListener("click", function () {
+      events.modeselect.done("singleplayer");
+    });
+    elements.buttons.coop.addEventListener("click", function () {
+      events.modeselect.done("coop");
+    });
+  },
+  singleplayer: () => {
+    elements.inputs.singleplayernickname.addEventListener(
+      "keydown",
+      function (e) {
+        if (e.code == "Enter") {
+          events.singleplayer.done(elements.inputs.singleplayernickname.value);
+        }
+      },
+    );
+    elements.buttons.singleplayerstart.addEventListener("click", function () {
+      events.singleplayer.done(elements.inputs.singleplayernickname.value);
+    });
+  },
+  coop: () => {
+    elements.inputs.coopnickname.addEventListener("keydown", function (e) {
       if (e.code == "Enter") {
-        events.login.done(elements.inputs.nickname.value);
+        events.coop.done(elements.inputs.coopnickname.value);
       }
     });
-    elements.buttons.start.addEventListener("click", function () {
-      events.login.done(elements.inputs.nickname.value);
+    elements.buttons.coopstart.addEventListener("click", function () {
+      events.coop.done(elements.inputs.coopnickname.value);
     });
   },
-  highscore: () => {
-    elements.buttons.newGame.addEventListener("click", function () {
-      events.highscore.newgame(elements.inputs.nickname.value);
+  singleplayerhighscore: () => {
+    elements.buttons.singleplayernewgame.addEventListener("click", function () {
+      events.singleplayerhighscore.newgame(
+        elements.inputs.singleplayernickname.value,
+      );
+    });
+    elements.buttons.singleplayermainmenu.addEventListener(
+      "click",
+      function () {
+        events.singleplayerhighscore.mainmenu(
+          elements.inputs.singleplayernickname.value,
+        );
+      },
+    );
+  },
+  coophighscore: () => {
+    elements.buttons.coopmainmenu.addEventListener("click", function () {
+      events.coophighscore.mainmenu(elements.inputs.coopnickname.value);
     });
   },
-  game: () => {
+  singleplayergame: () => {
   },
 };
 
 // Define updater functions for each screen, run each time a screen is shown
 const updaters = {
-  login: () => {
+  singleplayer: () => {
     // Fetch highscore
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "api/highscores");
@@ -93,7 +146,7 @@ const updaters = {
           });
         }
 
-        elements.containers.hsAth.innerHTML = html;
+        elements.containers.hsSingleplayerAth.innerHTML = html;
 
         html = "";
         current = 0;
@@ -114,17 +167,17 @@ const updaters = {
           });
         }
 
-        elements.containers.hsWeek.innerHTML = html;
+        elements.containers.hsSingleplayerWeek.innerHTML = html;
       }
     };
     xhr.send();
 
     // Focus on nickname
-    elements.inputs.nickname.focus();
+    elements.inputs.singleplayernickname.focus();
   },
-  highscore: (score) => {
+  singleplayerhighscore: (score) => {
     // Update your score details
-    elements.containers.hsYourScore.innerHTML = `
+    elements.containers.hsSingleplayerYourScore.innerHTML = `
       <h5>Your Score: ${score}</h5>
       <!-- Additional score details -->
     `;
@@ -151,7 +204,7 @@ const updaters = {
           });
         }
 
-        elements.containers.hsAllTime.innerHTML = html;
+        elements.containers.hsSingleplayerAllTime.innerHTML = html;
 
         html = "";
         current = 0;
@@ -169,7 +222,7 @@ const updaters = {
           });
         }
 
-        elements.containers.hsLast7Days.innerHTML = html;
+        elements.containers.hsSingleplayerLast7Days.innerHTML = html;
       }
     };
     xhr.send();

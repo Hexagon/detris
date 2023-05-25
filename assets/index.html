@@ -11,12 +11,53 @@
   </head>
   <body>
     <div id="wrapper">
-  <div class="container view" id="viewMenu" style="display: none;">
+
+      <div class="container view" id="viewModeselect" style="display: none;">
+        <div class="row">
+          <div class="twelve columns">
+            <h5>Select mode</h5>
+            <button id="btnSingleplayer">Singleplayer</button>
+            <button id="btnCoop" disabled="disabled">Co-Op</button>
+            <br>
+            <br>
+            <h5>Instructions</h5>
+            <hr>
+            <table class="fill">
+              <tr>
+                <td>Move left</td>
+                <td class="align-right"><code>Left</code></td>
+              </tr>
+              <tr>
+                <td>Move right</td>
+                <td class="align-right"><code>Right</code></td>
+              </tr>
+              <tr>
+                <td>CW rotation</td>
+                <td class="align-right"><code>Up</code> or <code>A</code></td>
+              </tr>
+              <tr>
+                <td>CCW rotation</td>
+                <td class="align-right"><code>D</code></td>
+              </tr>
+              <tr>
+                <td>Soft drop</td>
+                <td class="align-right"><code>Down</code></td>
+              </tr>
+              <tr>
+                <td>Hard drop</td>
+                <td class="align-right"><code>Space</code></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+  <div class="container view" id="viewSingleplayer" style="display: none;">
     <div class="row">
       <div class="four columns">
-        <input class="u-full-width" type="text" placeholder="Nickname" id="txtNickname">
+        <input class="u-full-width" type="text" placeholder="Nickname" id="txtSingleplayerNickname">
         <span id="message" class="hidden">Testerr</span>
-        <button id="btnStart">Start game</button>
+        <button id="btnSingleplayerStart">Start game</button>
         <br>
         <br>
         <h5>Instructions</h5>
@@ -51,19 +92,19 @@
       <div class="four columns">
         <h5>All time high</h5>
         <hr>
-        <div id="hsAth">
+        <div id="hsSingleplayerAth">
         </div>
       </div>
       <div class="four columns">
         <h5>Last 7 days</h5>
         <hr>
-        <div id="hsWeek">
+        <div id="hsSingleplayerWeek">
         </div>
       </div>
     </div>
   </div>
 
-  <div class="container view" id="viewGame" style="display: none;">
+  <div class="container view" id="viewSingleplayerGame" style="display: none;">
     <div class="row">
       <div class="eight columns">
         <div id="game"></div>
@@ -71,32 +112,125 @@
       <div class="four columns">
         <h5>Live Highscore (24h)</h5>
         <hr>
-        <div id="hsToday"></div>
+        <div id="hsSingleplayerToday"></div>
       </div>
     </div>
   </div>
 
-  <div class="container view" id="viewHighscore" style="display: none;">
+  <div class="container view" id="viewCoop" style="display: none;">
+    <div class="row">
+      <div class="four columns">
+        <input class="u-full-width" type="text" placeholder="Nickname" id="txtCoopNickname">
+        <span id="message" class="hidden">Testerr</span>
+        <button id="btnCoopStart">Start game</button>
+        <br>
+        <br>
+        <h5>Instructions</h5>
+        <hr>
+        <table class="fill">
+         <tr>
+           <td>Move left</td>
+           <td class="align-right"><code>Left</code></td>
+         </tr>
+         <tr>
+           <td>Move right</td>
+           <td class="align-right"><code>Right</code></td>
+         </tr>
+         <tr>
+           <td>CW rotation</td>
+           <td class="align-right"><code>Up</code> or <code>A</code></td>
+         </tr>
+         <tr>
+           <td>CCW rotation</td>
+           <td class="align-right"><code>D</code></td>
+         </tr>
+         <tr>
+           <td>Soft drop</td>
+           <td class="align-right"><code>Down</code></td>
+         </tr>
+         <tr>
+           <td>Hard drop</td>
+           <td class="align-right"><code>Space</code></td>
+         </tr>
+        </table>
+      </div>
+      <div class="four columns">
+        <h5>All time high</h5>
+        <hr>
+        <div id="hsCoopAth">
+        </div>
+      </div>
+      <div class="four columns">
+        <h5>Last 7 days</h5>
+        <hr>
+        <div id="hsCoopWeek">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewCoopGame" style="display: none;">
+    <div class="row">
+      <div class="eight columns">
+        <div id="game"></div>
+      </div>
+      <div class="four columns">
+        <h5>Live Highscore (24h)</h5>
+        <hr>
+        <div id="hsCoopToday"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewSingleplayerHighscore" style="display: none;">
     <div class="row">
       <div class="four columns">
         <h5>Game over</h5>
         <hr>
-        <div id="hsYourScore">
+        <div id="hsSingleplayerYourScore">
           <!-- Your score details will be dynamically added here -->
         </div>
-        <button id="btnNewGame">Play Again!</button>
+        <button id="btnSingleplayerNewGame">Play Again!</button>
+        <button id="btnSingleplayerMainMenu">Main Menu</button>
       </div>
       <div class="four columns">
         <h5>All Time High</h5>
         <hr>
-        <div id="hsAllTime">
+        <div id="hsSingleplayerAllTime">
           <!-- All-time highscore entries will be dynamically added here -->
         </div>
       </div>
       <div class="four columns">
         <h5>Last 7 Days</h5>
         <hr>
-        <div id="hsLast7Days">
+        <div id="hsSingleplayerLast7Days">
+          <!-- Last 7 days highscore entries will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewCoopHighscore" style="display: none;">
+    <div class="row">
+      <div class="four columns">
+        <h5>Game over</h5>
+        <hr>
+        <div id="hsCoopYourScore">
+          <!-- Your score details will be dynamically added here -->
+        </div>
+        <button id="btnCoopMainMenu">Main Menu</button>
+      </div>
+      <div class="four columns">
+        <h5>All Time High</h5>
+        <hr>
+        <div id="hsCoopAllTime">
+          <!-- All-time highscore entries will be dynamically added here -->
+        </div>
+      </div>
+      <div class="four columns">
+        <h5>Last 7 Days</h5>
+        <hr>
+        <div id="hsCoopLast7Days">
           <!-- Last 7 days highscore entries will be dynamically added here -->
         </div>
       </div>

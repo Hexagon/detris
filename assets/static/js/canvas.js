@@ -34,6 +34,7 @@ class Canvas {
 
     // Place canvas at destination
     try {
+      destination.innerHTML = "";
       destination.appendChild(this.canvas);
     } catch (e) {
       console.error("Could not place canvas in destination:", e);

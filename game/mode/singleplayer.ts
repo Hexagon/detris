@@ -359,9 +359,10 @@ export class SinglePlayerGame extends Game {
       // Check that there is space below
       const targetX = v.X + p.X;
       const targetY = v.Y + p.Y; // Increment Y position by 1
-      const outOfRange = targetX < 0 || targetX > 10 - 1 || targetY < 0 ||
-        targetY > 22 - 1 ||
-        (this.grid.Data[targetX + targetY * 10] !== undefined);
+      const outOfRange = targetX < 0 || targetX > this.grid.width - 1 ||
+        targetY < 0 ||
+        targetY > this.grid.height - 1 ||
+        (this.grid.Data[targetX + targetY * this.grid.width] !== undefined);
       if (outOfRange) { // Check for undefined instead of null
         return false;
       }

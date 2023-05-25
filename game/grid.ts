@@ -3,8 +3,12 @@
 import { Vector } from "./tetromino.ts";
 
 export class GameGrid {
+  Data: Array<string | undefined>;
+
   // Standard tetris game field is 10 units wide and 22 units high, with the topmost 2 rows hidden
-  Data: Array<string | undefined> = new Array(10 * 22).fill(undefined);
+  constructor(public width = 10, public height = 22) {
+    this.Data = new Array(width * height).fill(undefined);
+  }
 
   // Grid methods
   Clear() {
@@ -22,7 +26,7 @@ export class GameGrid {
       const targetX = v.X + p.X;
       const targetY = v.Y + p.Y;
 
-      this.Data[targetX + targetY * 10] = t;
+      this.Data[targetX + targetY * this.width] = t;
 
       // End condition, return -1!
       if (targetY < 2) {
@@ -31,19 +35,20 @@ export class GameGrid {
     }
 
     // Check if we shall pop a row
-    for (let y = 2; y < 22; y++) {
+    for (let y = 2; y < this.height; y++) {
       let fullRow = true;
 
-      for (let x = 0; x < 10; x++) {
-        if (this.Data[x + y * 10] === undefined) {
+      for (let x = 0; x < this.width; x++) {
+        if (this.Data[x + y * this.width] === undefined) {
           fullRow = false;
         }
       }
 
       if (fullRow) {
         for (let y2 = y; y2 >= 1; y2--) {
-          for (let x = 0; x < 10; x++) {
-            this.Data[x + y2 * 10] = this.Data[x + (y2 - 1) * 10];
+          for (let x = 0; x < this.width; x++) {
+            this.Data[x + y2 * this.width] =
+              this.Data[x + (y2 - 1) * this.width];
           }
         }
         clearedRows += 1;
