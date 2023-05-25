@@ -1,10 +1,10 @@
 /**
  * Takes care of rendering the current game onto the viewport
  *
- * @file static/js/viewport.js
+ * @file static/js/viewports/singleplayer.js
  */
 
-import { Canvas } from "./canvas.js";
+import { Canvas } from "../canvas.js";
 
 class Viewport {
   constructor(destinationElmId, gf, width, height) {
