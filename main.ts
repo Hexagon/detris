@@ -15,7 +15,7 @@ serve((req: Request) => {
   if (req.headers.get("upgrade") == "websocket") {
     const { socket, response } = Deno.upgradeWebSocket(req);
 
-    Player(socket, kv);
+    const _player = new Player(socket, kv);
 
     return response;
   }

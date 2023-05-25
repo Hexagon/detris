@@ -1,3 +1,5 @@
+// server/router.ts
+
 import { read, readPlaying, readToday } from "../highscores/highscores.ts";
 
 const routes = [

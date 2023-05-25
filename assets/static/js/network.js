@@ -1,4 +1,9 @@
-// network.js
+/**
+ * WebSocket communication wrapper
+ *
+ * @file static/js/network.js
+ */
+
 class Network {
   constructor() {
     this.ws = null;

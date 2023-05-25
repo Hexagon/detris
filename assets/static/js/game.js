@@ -1,3 +1,9 @@
+/**
+ * Keeps track of the state of the current game
+ *
+ * @file static/js/game.js
+ */
+
 export class Game {
   constructor() {
     this.colors = {
@@ -10,28 +16,22 @@ export class Game {
       L: "rgb(255,165,0)", // Orange
     };
     this.data = null;
-    this.grid = null;
     this.playing = true;
     this.gameOver = null;
-    this.server = null;
+    this.state = null;
   }
-
   getData() {
     return this.data;
   }
-  getGrid() {
-    return this.data;
-  }
   getPlaying() {
-    return this.data;
+    return this.playing;
+  }
+  getState() {
+    return this.state;
   }
 
   setData(d) {
     this.data = d;
-  }
-
-  setGrid(g) {
-    this.grid = g;
   }
 
   setPlaying(p) {
@@ -40,6 +40,10 @@ export class Game {
 
   setGameOver() {
     this.gameOver && this.gameOver();
+  }
+
+  setState(s) {
+    this.state = s;
   }
 
   async play() {

@@ -1,3 +1,5 @@
+// highscores/highscores.ts
+
 interface Highscore {
   nickname: string;
   score: number;

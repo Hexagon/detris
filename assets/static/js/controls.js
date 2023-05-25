@@ -1,3 +1,9 @@
+/**
+ * Keeps track of player controls
+ *
+ * @file static/js/controls.js
+ */
+
 class Controls {
   #handleChange = null;
 
@@ -46,9 +52,11 @@ class Controls {
   }
 
   #initialize() {
+    // deno-lint-ignore no-window-prefix
     window.addEventListener("keydown", (e) => {
       this.#handleKeyDown(e);
     });
+    // deno-lint-ignore no-window-prefix
     window.addEventListener("keyup", (e) => {
       this.#handleKeyUp(e);
     });

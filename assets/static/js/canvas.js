@@ -1,3 +1,9 @@
+/**
+ * Wrapper for the viewport canvas element
+ *
+ * @file static/js/canvas.js
+ */
+
 class Canvas {
   constructor() {
     this.canvas = null;

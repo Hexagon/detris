@@ -1,10 +1,13 @@
-// viewport.js
+/**
+ * Takes care of rendering the current game onto the viewport
+ *
+ * @file static/js/viewport.js
+ */
+
 import { Canvas } from "./canvas.js";
 
 class Viewport {
   constructor(destinationElmId, gf, width, height) {
-    this.game = null;
-
     // Create new canvas
     this.canvas = new Canvas();
 
@@ -47,8 +50,8 @@ class Viewport {
     context.fillRect(195, 15, 210, 30);
   }
 
-  #drawTetromino(position, rotation, tetromino, ghost) {
-    const { context, game } = this;
+  #drawTetromino(position, rotation, tetromino, ghost, game) {
+    const { context } = this;
     const dx = position.X;
     const dy = position.Y;
 
@@ -88,10 +91,10 @@ class Viewport {
     }
   }
 
-  #drawData() {
-    const { context, game } = this;
-    if (game && game.grid) {
-      const data = game.grid.Data;
+  #drawData(game) {
+    const { context } = this;
+    if (game && game.data && game.data.Grid && game.data.Grid.Data) {
+      const data = game.data.Grid.Data;
 
       for (let y = 0; y < 22; y++) {
         for (let x = 0; x < 10; x++) {
@@ -121,25 +124,28 @@ class Viewport {
   }
 
   redraw(gameData) {
-    this.game = gameData;
-    if (this.game && this.game.data && this.context) {
-      const { context, dimensions, game } = this;
-      if (game.playing) {
+    if (gameData && this.context) {
+      const { context, dimensions } = this;
+      const game = gameData;
+      if (game.playing && game.data) {
         context.clearRect(0, 0, dimensions.width, dimensions.height);
 
         this.#drawBackground();
-        this.#drawData();
+        this.#drawData(game);
 
         this.#drawTetromino(
           game.data.Position,
           game.data.Rotation,
           game.data.Tetrominoes[0],
+          false,
+          game,
         );
         this.#drawTetromino(
           game.data.GhostPosition,
           game.data.Rotation,
           game.data.Tetrominoes[0],
           true,
+          game,
         );
 
         this.#drawHider();
@@ -154,9 +160,10 @@ class Viewport {
 
         context.font = "200 24px Raleway";
 
-        context.fillText(game.data.Score, 350, 80);
-        context.fillText(game.data.Level, 350, 150);
-        context.fillText(game.data.Lines, 350, 220);
+        // ToDo: Get from player insted
+        context.fillText(game.state?.Score || "0", 350, 80);
+        context.fillText(game.data?.Level || "0", 350, 150);
+        context.fillText(game.data?.Lines || "0", 350, 220);
 
         context.save();
         context.globalAlpha = 0.8;
@@ -165,7 +172,7 @@ class Viewport {
           0,
           game.data.Tetrominoes[1],
           false,
-          true,
+          game,
         );
         context.restore();
         context.save();
@@ -175,7 +182,7 @@ class Viewport {
           0,
           game.data.Tetrominoes[2],
           false,
-          true,
+          game,
         );
         context.restore();
         context.save();
@@ -185,7 +192,7 @@ class Viewport {
           0,
           game.data.Tetrominoes[3],
           false,
-          true,
+          game,
         );
         context.restore();
       }

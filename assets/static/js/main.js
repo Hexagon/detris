@@ -3,6 +3,7 @@
  *
  * @file js/main.js
  */
+
 import { Viewport } from "./viewport.js";
 import { Network } from "./network.js";
 import { Controls } from "./controls.js";
@@ -20,10 +21,10 @@ let currentGame = undefined;
 const network = new Network();
 const onNetworkMessage = (o) => {
   if (currentGame) {
-    if (o.Position) {
+    if (o.Score) {
+      currentGame.setState(o);
+    } else if (o.Position) {
       currentGame.setData(o);
-    } else if (o.Data) {
-      currentGame.setGrid(o);
     } else if (o.gameOver) {
       currentGame.setPlaying(false);
       currentGame.setGameOver();
@@ -40,6 +41,7 @@ controls.setHandleChange((c) => {
 });
 
 // Function which updates the live highscore
+let updateHsTimer;
 const updateLiveHighscore = () => {
   // Fetch highscore
   const xhr = new XMLHttpRequest();
@@ -70,6 +72,8 @@ const updateLiveHighscore = () => {
     }
   };
   xhr.send();
+
+  updateHsTimer = setTimeout(updateLiveHighscore, 5_000);
 };
 
 // Function which starts a new game
@@ -81,7 +85,6 @@ const newGame = async (nickname) => {
   network.sendPlayerReady(nickname);
 
   // Start highscore updater
-  const updateHsTimer = setInterval(updateLiveHighscore, 5_000);
   updateLiveHighscore();
 
   // Start playing
@@ -92,12 +95,12 @@ const newGame = async (nickname) => {
     console.error("An error occurred while playing.");
   } finally {
     // Stop highscore updater
-    clearInterval(updateHsTimer);
+    clearTimeout(updateHsTimer);
   }
 
   // Get score
-  if (currentGame.data.Score > 0) {
-    showScreen("highscore", currentGame.data.Score);
+  if (currentGame.getState().Score > 0) {
+    showScreen("highscore", currentGame.getState().Score);
   } else {
     showScreen("aborted");
   }

@@ -1,3 +1,5 @@
+// grid/grid.ts
+
 import { Vector } from "./tetromino.ts";
 
 export class GameGrid {

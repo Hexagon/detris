@@ -1,3 +1,9 @@
+/**
+ * Exports various utility functions
+ *
+ * @file static/js/utils.js
+ */
+
 export function htmlEscape(str) {
   if (!str) return "";
   if (typeof str === "number") return str;
