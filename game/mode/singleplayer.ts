@@ -196,7 +196,7 @@ export class SinglePlayerGame extends Game {
 
   iterateDelayMs(): number {
     // Reduce 25 ms for each level, bottom out on 110ms
-    return Math.min(500 - 25 * this.Level, 100);
+    return Math.max(500 - 25 * this.Level, 100);
   }
 
   moveDown(): boolean {
