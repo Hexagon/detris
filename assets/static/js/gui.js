@@ -113,7 +113,7 @@ const updaters = {
   modeselect: () => {
     // Fetch highscore
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "api/highscores");
+    xhr.open("GET", "api/highscores/singleplayer");
     xhr.onload = function () {
       if (xhr.status === 200) {
         const res = JSON.parse(xhr.responseText);
@@ -153,7 +153,7 @@ const updaters = {
 
     // Fetch highscore
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "api/highscores");
+    xhr.open("GET", "api/highscores/singleplayer");
     xhr.onload = function () {
       if (xhr.status === 200) {
         const res = JSON.parse(xhr.responseText);

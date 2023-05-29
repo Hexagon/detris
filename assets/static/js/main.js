@@ -18,9 +18,7 @@ let currentGame = undefined;
 const network = new Network();
 const onNetworkMessage = (o) => {
   if (currentGame) {
-    if (o.Score) {
-      currentGame.setState(o);
-    } else if (o.Position || o.Position1) {
+    if (o.Grid) {
       currentGame.setData(o);
     } else if (o.gameOver) {
       currentGame.setPlaying(false);
@@ -45,11 +43,11 @@ onScreenEvent("aborted", "ok", () => {
 // Show mode select screen
 showScreen("modeselect");
 onScreenEvent("modeselect", "singleplayer", (nickname) => {
-  showScreen("loading")
+  showScreen("loading");
   currentGame = StartSingleplayer(nickname, network);
 });
 onScreenEvent("modeselect", "coop", (nickname, code) => {
-  showScreen("starting")
+  showScreen("starting");
   currentGame = StartCoop(nickname, code, network);
 });
 

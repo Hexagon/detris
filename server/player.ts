@@ -7,16 +7,6 @@ import * as highscores from "../highscores/highscores.ts";
 import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
 import { CoopGame } from "../game/mode/coop.ts";
 
-interface PlayerState {
-  Score: number;
-  Level: number;
-  Lines: number;
-  Winner: boolean | null;
-  GameId: string | null;
-  GameConnected: number | null;
-  Updated: number | null;
-}
-
 const FindGame = async (
   games: Game[],
   gameType: string,
@@ -51,8 +41,8 @@ const FindGame = async (
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // Not first check anymore
-  if (!firstCheck) firstCheck = Date.now()
-  
+  if (!firstCheck) firstCheck = Date.now();
+
   // Recurse
   return await FindGame(games, gameType, maxPlayers, code, firstCheck);
 };
@@ -60,16 +50,13 @@ const FindGame = async (
 class Player {
   private socket: WebSocket;
   private g: Game | null;
-  private state: PlayerState;
-  private nickname?: string;
+  private nickname = "Undef";
 
   // Player is not ready yet!
   private ready = false;
 
   constructor(socket: WebSocket, games: Game[]) {
     this.g = null;
-
-    this.state = this.constructState(null);
 
     this.socket = socket;
 
@@ -103,20 +90,17 @@ class Player {
 
             // Join Co-Op game
           } else if (data.mode === "coop") {
-            // Public game
-            if (!data.code || data.code == "") {
-              // Find game
-              const foundGame = await FindGame(games, "coop", 1, data.code);
-              if (foundGame) {
-                this.g = foundGame;
-              } else {
-                // Create game
-                this.g = new CoopGame(data.code);
-                games.push(this.g);
-              }
+            // Find game
+            const foundGame = await FindGame(games, "coop", 1, data.code);
+            if (foundGame) {
+              this.g = foundGame;
             } else {
-              throw new Error("Invalid game mode requested: " + data.mode);
+              // Create game
+              this.g = new CoopGame(data.code);
+              games.push(this.g);
             }
+          } else {
+            throw new Error("Invalid game mode requested: " + data.mode);
           }
 
           if (!this.g) {
@@ -153,52 +137,8 @@ class Player {
     this.nickname = nickname;
   }
 
-  private constructState(id: string | null) {
-    return {
-      Score: 0,
-      Level: 0,
-      Lines: 0,
-      GameId: id,
-      GameConnected: Date.now(),
-      Updated: Date.now(),
-      Winner: null,
-    };
-  }
-
   public setGame(g: Game | null) {
     this.g = g;
-  }
-
-  public addScore(newScore: number) {
-    this.state.Score += newScore;
-    this.state.Updated = Date.now();
-    this.writeHighscore();
-    this.sendMessage(JSON.stringify(this.state));
-  }
-
-  public setLines(newLines: number) {
-    this.state.Lines = newLines;
-    this.state.Updated = Date.now();
-    this.writeHighscore();
-    this.sendMessage(JSON.stringify(this.state));
-  }
-
-  public setLevel(newLevel: number) {
-    this.state.Level = newLevel;
-    this.state.Updated = Date.now();
-    this.writeHighscore();
-    this.sendMessage(JSON.stringify(this.state));
-  }
-
-  private writeHighscore() {
-    highscores.write({
-      nickname: this.nickname || "undefined",
-      score: this.state.Score,
-      level: this.state.Level,
-      lines: this.state.Lines,
-      ts: new Date(this.state.Updated || Date.now()),
-      tsInit: this.state.GameConnected || Date.now(),
-    });
   }
 
   private validateNickname(n: string): string | undefined {
@@ -210,6 +150,10 @@ class Player {
     } else if (n.length > 15) {
       return "Nickname too long, need to be at most 15 characters";
     }
+  }
+
+  public getNickname(): string {
+    return this.nickname;
   }
 }
 

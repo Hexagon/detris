@@ -161,7 +161,7 @@ class Viewport {
         context.font = "200 24px Raleway";
 
         // ToDo: Get from player insted
-        context.fillText(game.state?.Score || "0", 330, 80);
+        context.fillText(game.data?.Score || "0", 330, 80);
         context.fillText(game.data?.Level || "0", 330, 150);
         context.fillText(game.data?.Lines || "0", 330, 220);
 

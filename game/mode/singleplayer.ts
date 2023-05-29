@@ -36,6 +36,7 @@ export class SinglePlayerGame extends Game {
 
   timerReal: Date;
   timerModified: Date;
+  lastScore: number;
 
   /**
    * Creates a new SinglePlayerGame instance.
@@ -54,6 +55,10 @@ export class SinglePlayerGame extends Game {
     this.Score = 0;
     this.Level = 0;
     this.Lines = 0;
+
+    // Keep track if score has changed since last call to scoreChanged()
+    this.lastScore = -1;
+
     this.keyStates = new Map<string, boolean>();
 
     this.timerReal = new Date();
@@ -106,6 +111,7 @@ export class SinglePlayerGame extends Game {
       Position: this.Position,
       Level: this.Level,
       Lines: this.Lines,
+      Score: this.Score,
       GhostPosition: this.GhostPosition,
       Rotation: this.Rotation,
       Tetrominoes: this.Tetrominoes,
@@ -129,7 +135,7 @@ export class SinglePlayerGame extends Game {
 
     return false;
   }
-  
+
   private setKey(key: string, state: boolean): void {
     if (state) {
       switch (key) {
@@ -240,7 +246,6 @@ export class SinglePlayerGame extends Game {
 
     // End condition ?
     if (clearedRows == -1) {
-      this.status = "gameover";
       return false;
     }
 
@@ -284,10 +289,7 @@ export class SinglePlayerGame extends Game {
     } else {
       newScore += baseScore;
     }
-    // Assign the score to all connected players
-    for (const player of this.listPlayers()) {
-      player.addScore(newScore);
-    }
+    this.Score += newScore;
   }
 
   resetTimerIfLanded(): void {
@@ -353,5 +355,11 @@ export class SinglePlayerGame extends Game {
     }
 
     return true;
+  }
+
+  scoreChanged(): boolean {
+    const newScore = this.Score !== this.lastScore;
+    this.lastScore = this.Score;
+    return newScore;
   }
 }

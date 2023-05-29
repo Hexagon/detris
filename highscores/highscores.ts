@@ -27,9 +27,9 @@ interface HighscoreMessageToday {
 
 const kv = await Deno.openKv(Deno.env.get("DETRIS_PERSIST_PATH"));
 
-export async function write(h: Highscore): Promise<boolean> {
+export async function write(mode: string, h: Highscore): Promise<boolean> {
   try {
-    const key = ["highscores", h.tsInit];
+    const key = ["highscores", mode, h.tsInit];
     await kv.set(key, h);
     return true;
   } catch (error) {
@@ -38,7 +38,7 @@ export async function write(h: Highscore): Promise<boolean> {
   }
 }
 
-export async function read(): Promise<HighscoreMessage | null> {
+export async function read(mode: string): Promise<HighscoreMessage | null> {
   const ath: Highscore[] = [];
   const week: Highscore[] = [];
 
@@ -46,7 +46,7 @@ export async function read(): Promise<HighscoreMessage | null> {
   const weekBefore = new Date();
   weekBefore.setDate(weekBefore.getDate() - 7);
 
-  for await (const entry of kv.list({ prefix: ["highscores"] })) {
+  for await (const entry of kv.list({ prefix: ["highscores", mode] })) {
     const hs: Highscore = entry.value as Highscore;
     if (hs.ts >= weekBefore) {
       week.push(hs);
@@ -60,7 +60,29 @@ export async function read(): Promise<HighscoreMessage | null> {
   return { ath: ath.slice(0, 9), week: week.slice(0, 9), now: Date.now() };
 }
 
-export async function readPlaying(): Promise<HighscoreMessageNow | null> {
+// Used temporarily to migrate old scores
+export async function old(): Promise<{ key: Deno.KvKey; value: Highscore }[]> {
+  // deno-lint-ignore no-explicit-any
+  const oldScores: { key: Deno.KvKey; value: Highscore }[] = [];
+
+  // 365 days before now
+  const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000 * 365;
+
+  for await (
+    const entry of kv.list({
+      start: ["highscores", oneDayBefore],
+      end: ["highscores", Date.now() + 1],
+    })
+  ) {
+    oldScores.push(entry as { key: Deno.KvKey; value: Highscore });
+  }
+
+  return oldScores;
+}
+
+export async function readPlaying(
+  mode: string,
+): Promise<HighscoreMessageNow | null> {
   const playing: Highscore[] = [];
 
   // 1 week before now
@@ -69,8 +91,8 @@ export async function readPlaying(): Promise<HighscoreMessageNow | null> {
 
   for await (
     const entry of kv.list({
-      start: ["highscores", oneDayBefore],
-      end: ["highscores", Date.now() + 1],
+      start: ["highscores", mode, oneDayBefore],
+      end: ["highscores", mode, Date.now() + 1],
     })
   ) {
     const hs: Highscore = entry.value as Highscore;
@@ -84,7 +106,9 @@ export async function readPlaying(): Promise<HighscoreMessageNow | null> {
   return { playing: playing.slice(0, 9), now: Date.now() };
 }
 
-export async function readToday(): Promise<HighscoreMessageToday | null> {
+export async function readToday(
+  mode: string,
+): Promise<HighscoreMessageToday | null> {
   const today: Highscore[] = [];
 
   // 1 week before now
@@ -92,8 +116,8 @@ export async function readToday(): Promise<HighscoreMessageToday | null> {
 
   for await (
     const entry of kv.list({
-      start: ["highscores", oneDayBefore],
-      end: ["highscores", Date.now() + 24 * 60 * 60 * 1_000],
+      start: ["highscores", mode, oneDayBefore],
+      end: ["highscores", mode, Date.now() + 24 * 60 * 60 * 1_000],
     })
   ) {
     const hs: Highscore = entry.value as Highscore;

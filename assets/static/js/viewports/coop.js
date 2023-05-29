@@ -177,12 +177,12 @@ class Viewport {
         context.font = "200 24px Raleway";
 
         // ToDo: Get from player insted
-        context.fillText(game.state?.Score || "0", 0, 340);
+        context.fillText(game.data?.Score || "0", 0, 340);
         context.fillText(game.data?.Level || "0", 550, 340);
         context.fillText(game.data?.Lines || "0", 550, 410);
-        
+
         context.fillText("Player 1", 0, 30);
-        
+
         context.fillText("Player 2", 550, 30);
 
         // Draw queue

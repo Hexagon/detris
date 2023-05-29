@@ -33,9 +33,8 @@ const StartCoop = (nickname, code, network) => {
     }
 
     // Get score
-    console.log("Game Over, state", game.getState());
-    if (game.getState().Score > 0) {
-      showScreen("coophighscore", game.getState().Score);
+    if (game.getData().Score > 0) {
+      showScreen("coophighscore", game.getData().Score);
     } else {
       showScreen("aborted");
     }

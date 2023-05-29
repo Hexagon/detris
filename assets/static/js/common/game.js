@@ -20,7 +20,6 @@ export class Game {
     this.data = null;
     this.playing = true;
     this.gameOver = null;
-    this.state = null;
     this.viewport = null;
   }
   getData() {
@@ -28,9 +27,6 @@ export class Game {
   }
   getPlaying() {
     return this.playing;
-  }
-  getState() {
-    return this.state;
   }
   getViewport() {
     return this.viewport;
@@ -47,10 +43,6 @@ export class Game {
   }
   setViewport(v) {
     this.viewport = v;
-  }
-
-  setState(s) {
-    this.state = s;
   }
 
   async play() {

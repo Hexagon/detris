@@ -3,10 +3,16 @@
 import { serve } from "https://deno.land/std@0.184.0/http/server.ts";
 import { serveFile } from "https://deno.land/std@0.184.0/http/file_server.ts";
 import { join, resolve } from "https://deno.land/std@0.184.0/path/mod.ts";
-
+import * as highscore from "./highscores/highscores.ts";
 import { Player } from "./server/player.ts";
 import { Router } from "./server/router.ts";
 import { Game } from "./game/game.ts";
+
+// Migrate old scores
+const oldScores = highscore.old();
+for (const score of await oldScores) {
+  highscore.write("singleplayer", score.value);
+}
 
 // Main game loop
 const games: Game[] = [];
@@ -29,9 +35,30 @@ const MainLoop = () => {
       // Iterate games when playing
       if (game.getStatus() === "playing") {
         if (!game.iterate()) {
-          // ToDo: Broadcast gameOver: true here
           game.over();
         }
+      }
+
+      // Update highscore if score changed
+      if (game.scoreChanged()) {
+        // Determine nickname
+        let nickname = "";
+        if (game.listPlayers().length == 2) {
+          nickname = game.listPlayers()[0].getNickname() + " & " +
+            game.listPlayers()[1].getNickname();
+        } else {
+          nickname = game.listPlayers()[0].getNickname();
+        }
+
+        // Write highscore
+        highscore.write(game.getMode(), {
+          nickname: nickname,
+          score: (game.getData() as { Score: number }).Score,
+          level: (game.getData() as { Level: number }).Level,
+          lines: (game.getData() as { Lines: number }).Lines,
+          ts: new Date(),
+          tsInit: game.getCreateTime(),
+        });
       }
 
       // Cleanup ended games

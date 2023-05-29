@@ -16,7 +16,7 @@ let updateHsTimer;
 const updateLiveHighscore = () => {
   // Fetch highscore
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", "api/today");
+  xhr.open("GET", "api/today/singleplayer");
   xhr.onload = function () {
     if (xhr.status === 200) {
       const res = JSON.parse(xhr.responseText);
@@ -75,8 +75,8 @@ const StartSingleplayer = (nickname, network) => {
     }
 
     // Get score
-    if (game.getState().Score > 0) {
-      showScreen("singleplayerhighscore", game.getState().Score);
+    if (game.getData().Score > 0) {
+      showScreen("singleplayerhighscore", game.getData().Score);
     } else {
       showScreen("aborted");
     }

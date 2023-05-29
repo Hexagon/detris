@@ -36,6 +36,7 @@ export class CoopGame extends Game {
 
   timerReal: Date;
   timerModified: Date;
+  lastScore: number;
 
   /**
    * Creates a new CoOpGame instance.
@@ -61,6 +62,10 @@ export class CoopGame extends Game {
     this.Score = 0;
     this.Level = 0;
     this.Lines = 0;
+
+    // Keep track if score has changed since last call to scoreChanged()
+    this.lastScore = -1;
+
     this.keyStates1 = new Map<string, boolean>();
     this.keyStates2 = new Map<string, boolean>();
 
@@ -103,7 +108,6 @@ export class CoopGame extends Game {
   }
 
   changed(): void {
-
     const currentSprite1 = this.Tetrominoes[0][0].Sprites[this.Rotation1].Data;
     const currentSprite2 = this.Tetrominoes[1][0].Sprites[this.Rotation2].Data;
 
@@ -131,6 +135,7 @@ export class CoopGame extends Game {
       Position2: this.Position2,
       Level: this.Level,
       Lines: this.Lines,
+      Score: this.Score,
       GhostPosition1: this.GhostPosition1,
       GhostPosition2: this.GhostPosition2,
       Rotation1: this.Rotation1,
@@ -169,7 +174,7 @@ export class CoopGame extends Game {
     keyStates: Map<string, boolean>,
     key: string,
     state: boolean,
-    playerIndex: number
+    playerIndex: number,
   ): void {
     if (state) {
       switch (key) {
@@ -294,6 +299,12 @@ export class CoopGame extends Game {
     this.addScore(dropOffset * 2, true);
 
     this.lockdown(playerIndex);
+  }
+
+  scoreChanged(): boolean {
+    const newScore = this.Score !== this.lastScore;
+    this.lastScore = this.Score;
+    return newScore;
   }
 
   lockdown(playerIndex: number): boolean {
@@ -443,13 +454,13 @@ export class CoopGame extends Game {
     }
   }
 
-  addScore(points: number, multiplayer: boolean): void {
-    let scoreMultiplier = 1;
-
-    if (multiplayer) {
-      scoreMultiplier = 2;
+  addScore(baseScore: number, levelBoost: boolean) {
+    let newScore = 0;
+    if (levelBoost) {
+      newScore += baseScore * (this.Level + 1);
+    } else {
+      newScore += baseScore;
     }
-
-    this.Score += points * scoreMultiplier;
+    this.Score += newScore;
   }
 }

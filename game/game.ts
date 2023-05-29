@@ -34,11 +34,11 @@ export class Game {
 
   over(): void {
     this.status = "gameover";
-    this.broadcast({ gameOver: true })
+    this.broadcast({ gameOver: true });
   }
 
   broadcast(m: unknown) {
-    throw new Error("Broadcast not implemented")
+    throw new Error("Broadcast not implemented");
   }
 
   abandon(): void {
@@ -49,6 +49,10 @@ export class Game {
     this.status = "playing";
   }
 
+  scoreChanged(): boolean {
+    throw new Error("scoreChanged not implemented");
+  }
+
   getData(): unknown {
     throw new Error("getData not implemented");
   }
@@ -57,11 +61,11 @@ export class Game {
     return this.status;
   }
 
-  getMode(): unknown {
+  getMode(): string {
     return this.mode;
   }
 
-  getCode(): unknown {
+  getCode(): string {
     return this.code;
   }
 
