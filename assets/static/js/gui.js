@@ -11,24 +11,26 @@ const elements = {
   screens: {
     modeselect: document.getElementById("viewModeselect"),
 
-    singleplayer: document.getElementById("viewSingleplayer"),
     singleplayergame: document.getElementById("viewSingleplayerGame"),
     singleplayerhighscore: document.getElementById("viewSingleplayerHighscore"),
 
-    coop: document.getElementById("viewCoop"),
     coopgame: document.getElementById("viewCoopGame"),
     coophighscore: document.getElementById("viewCoopHighscore"),
 
     loading: document.getElementById("viewLoading"),
+    starting: document.getElementById("viewStarting"),
     aborted: document.getElementById("viewAborted"),
   },
+  labels: {
+    status: document.getElementById("lblStarting"),
+  },
   inputs: {
-    singleplayernickname: document.getElementById("txtSingleplayerNickname"),
-    coopnickname: document.getElementById("txtCoopNickname"),
+    nickname: document.getElementById("txtNickname"),
+    checkprivate: document.getElementById("chkPrivate"),
+    code: document.getElementById("txtCode"),
   },
   buttons: {
     singleplayer: document.getElementById("btnSingleplayer"),
-    singleplayerstart: document.getElementById("btnSingleplayerStart"),
     singleplayernewgame: document.getElementById("btnSingleplayerNewGame"),
     singleplayermainmenu: document.getElementById("btnSingleplayerMainMenu"),
 
@@ -37,14 +39,14 @@ const elements = {
     coopmainmenu: document.getElementById("btnCoopMainMenu"),
   },
   containers: {
-    /* Single player menu view */
+    /* Mode select view */
     hsSingleplayerAth: document.getElementById("hsSingleplayerAth"),
-    hsSingleplayerWeek: document.getElementById("hsSingleplayerWeek"),
+    hsCoopAth: document.getElementById("hsCoopAth"),
+
+    /* Single player game view */
     hsSingleplayerToday: document.getElementById("hsSingleplayerToday"),
 
-    /* Co-op menu view */
-    hsCoopAth: document.getElementById("hsCoopAth"),
-    hsCoopWeek: document.getElementById("hsCoopWeek"),
+    /* Co-Op game view */
     hsCoopToday: document.getElementById("hsCoopToday"),
 
     /* Single player highscore view */
@@ -65,62 +67,50 @@ const events = {};
 const initializers = {
   modeselect: () => {
     elements.buttons.singleplayer.addEventListener("click", function () {
-      events.modeselect.done("singleplayer");
+      events.modeselect.singleplayer(elements.inputs.nickname.value);
     });
     elements.buttons.coop.addEventListener("click", function () {
-      events.modeselect.done("coop");
+      events.modeselect.coop(
+        elements.inputs.nickname.value,
+        elements.inputs.code.value,
+      );
     });
-  },
-  singleplayer: () => {
-    elements.inputs.singleplayernickname.addEventListener(
-      "keydown",
-      function (e) {
-        if (e.code == "Enter") {
-          events.singleplayer.done(elements.inputs.singleplayernickname.value);
-        }
-      },
-    );
-    elements.buttons.singleplayerstart.addEventListener("click", function () {
-      events.singleplayer.done(elements.inputs.singleplayernickname.value);
-    });
-  },
-  coop: () => {
-    elements.inputs.coopnickname.addEventListener("keydown", function (e) {
-      if (e.code == "Enter") {
-        events.coop.done(elements.inputs.coopnickname.value);
+    elements.inputs.checkprivate.addEventListener("change", function (e) {
+      if (e.checked) {
+        elements.inputs.code.style.display = "none";
+      } else {
+        elements.inputs.code.style.display = "block";
       }
-    });
-    elements.buttons.coopstart.addEventListener("click", function () {
-      events.coop.done(elements.inputs.coopnickname.value);
     });
   },
   singleplayerhighscore: () => {
     elements.buttons.singleplayernewgame.addEventListener("click", function () {
       events.singleplayerhighscore.newgame(
-        elements.inputs.singleplayernickname.value,
+        elements.inputs.nickname.value,
       );
     });
     elements.buttons.singleplayermainmenu.addEventListener(
       "click",
       function () {
         events.singleplayerhighscore.mainmenu(
-          elements.inputs.singleplayernickname.value,
+          elements.inputs.nickname.value,
         );
       },
     );
   },
   coophighscore: () => {
     elements.buttons.coopmainmenu.addEventListener("click", function () {
-      events.coophighscore.mainmenu(elements.inputs.coopnickname.value);
+      events.coophighscore.mainmenu(elements.inputs.nickname.value);
     });
   },
   singleplayergame: () => {
+    /* Lots of empty */
   },
 };
 
 // Define updater functions for each screen, run each time a screen is shown
 const updaters = {
-  singleplayer: () => {
+  modeselect: () => {
     // Fetch highscore
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "api/highscores");
@@ -147,33 +137,12 @@ const updaters = {
         }
 
         elements.containers.hsSingleplayerAth.innerHTML = html;
-
-        html = "";
-        current = 0;
-
-        if (res.week) {
-          res.week.forEach(function (hs) {
-            if (current++ < max) {
-              const playingClass = (Date.parse(hs.ts) > Date.now() - 10_000)
-                ? " playing"
-                : "";
-              html += '<div class="highscore-entry' + playingClass +
-                '"><h5 class="right no-margin">' +
-                htmlEscape(hs.score) +
-                '</h5><h5 class="no-margin">' +
-                htmlEscape(hs.nickname) +
-                "</h5></div>";
-            }
-          });
-        }
-
-        elements.containers.hsSingleplayerWeek.innerHTML = html;
       }
     };
     xhr.send();
 
     // Focus on nickname
-    elements.inputs.singleplayernickname.focus();
+    elements.inputs.nickname.focus();
   },
   singleplayerhighscore: (score) => {
     // Update your score details

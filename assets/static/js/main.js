@@ -9,6 +9,7 @@ import { Controls } from "./controls.js";
 import { onScreenEvent, showScreen } from "./gui.js";
 
 import { StartSingleplayer } from "./modes/singleplayer.js";
+import { StartCoop } from "./modes/coop.js";
 
 // Set up game
 let currentGame = undefined;
@@ -19,7 +20,7 @@ const onNetworkMessage = (o) => {
   if (currentGame) {
     if (o.Score) {
       currentGame.setState(o);
-    } else if (o.Position) {
+    } else if (o.Position || o.Position1) {
       currentGame.setData(o);
     } else if (o.gameOver) {
       currentGame.setPlaying(false);
@@ -40,21 +41,19 @@ controls.setHandleChange((c) => {
 onScreenEvent("aborted", "ok", () => {
   showScreen("modeselect");
 });
-onScreenEvent("modeselect", "done", (mode) => {
-  if (mode === "singleplayer") {
-    showScreen("singleplayer");
-  } else if (mode === "coop") {
-    showScreen("coop");
-  }
-});
 
 // Show mode select screen
 showScreen("modeselect");
-
-// Singleplayer initialization
-onScreenEvent("singleplayer", "done", (nickname) => {
+onScreenEvent("modeselect", "singleplayer", (nickname) => {
+  showScreen("loading")
   currentGame = StartSingleplayer(nickname, network);
 });
+onScreenEvent("modeselect", "coop", (nickname, code) => {
+  showScreen("starting")
+  currentGame = StartCoop(nickname, code, network);
+});
+
+// Singleplayer initialization
 onScreenEvent("singleplayerhighscore", "newgame", (nickname) => {
   currentGame = StartSingleplayer(nickname, network);
 });
@@ -65,7 +64,4 @@ onScreenEvent(
 );
 
 // Co-Op initialization
-onScreenEvent("coop", "done", (nickname) => {
-  currentGame = StartCoop(nickname, network);
-});
 onScreenEvent("coophighscore", "mainmenu", () => showScreen("modeselect"));

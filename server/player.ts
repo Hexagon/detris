@@ -1,8 +1,11 @@
 // server/player.ts
 
 import { Game } from "../game/game.ts";
-import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
+
 import * as highscores from "../highscores/highscores.ts";
+
+import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
+import { CoopGame } from "../game/mode/coop.ts";
 
 interface PlayerState {
   Score: number;
@@ -14,6 +17,46 @@ interface PlayerState {
   Updated: number | null;
 }
 
+const FindGame = async (
+  games: Game[],
+  gameType: string,
+  maxPlayers: number,
+  code?: string,
+  firstCheck?: number,
+): Promise<Game | undefined> => {
+  console.log("Looking for game");
+
+  // Look for a suitable game
+  for (const g of games) {
+    if (
+      g.getStatus() == "created" && g.listPlayers().length <= maxPlayers &&
+      g.getMode() == gameType
+    ) {
+      // Check code
+      // Undefined == Public in both store and input parameter
+      if (g.getCode() === code) {
+        console.log("Game found");
+        return g;
+      }
+    }
+  }
+
+  // Bail out after 5 seconds
+  if (firstCheck && (Date.now() - firstCheck) > 5_000) {
+    console.log("Game not found after 5 seconds, bailing out");
+    return undefined;
+  }
+
+  // Wait 2 seconds
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Not first check anymore
+  if (!firstCheck) firstCheck = Date.now()
+  
+  // Recurse
+  return await FindGame(games, gameType, maxPlayers, code, firstCheck);
+};
+
 class Player {
   private socket: WebSocket;
   private g: Game | null;
@@ -23,56 +66,24 @@ class Player {
   // Player is not ready yet!
   private ready = false;
 
-  constructor(socket: WebSocket) {
+  constructor(socket: WebSocket, games: Game[]) {
     this.g = null;
+
     this.state = this.constructState(null);
 
     this.socket = socket;
 
-    const loop = () => {
-      if (this.ready) {
-        // Check for end condition
-        if (this.g && !this.g.iterate()) {
-          // End condition
-          try {
-            this.socket.send('{ "gameOver": true }');
-          } catch (_e) {
-            console.error("Lost connection to client ...");
-          }
-
-          // End game
-          this.ready = false;
-
-          return;
-        }
-      }
-
-      // Recurse!
-      if (this.ready) {
-        setTimeout(() => loop(), 50);
-      }
-    };
-
-    this.socket.addEventListener("open", () => {
-      // Register player
-      console.log("A client connected!");
-
-      // Give the user a unique id
-      // const uuid = crypto.randomUUID();
-
-      // Store user in kv
-      // await kv.set(["status", uuid], { status: "connected", ts: new Date() });
-    });
-
     // Handle incoming messages
-    this.socket.addEventListener("message", (event) => {
+    this.socket.addEventListener("message", async (event) => {
       let data = null;
+
       try {
         data = JSON.parse(event.data);
       } catch (_e) {
         /* ignore */
       }
-      if (data?.packet === "ready") {
+
+      if (data?.packet === "ready" && data?.mode) {
         const nickname = data.nickname;
         const validationError = this.validateNickname(nickname);
         if (validationError) {
@@ -86,7 +97,31 @@ class Player {
           this.setNickname(nickname);
 
           // Create new singleplayer game
-          this.g = new SinglePlayerGame();
+          if (data.mode === "singleplayer") {
+            this.g = new SinglePlayerGame(data.code);
+            games.push(this.g);
+
+            // Join Co-Op game
+          } else if (data.mode === "coop") {
+            // Public game
+            if (!data.code || data.code == "") {
+              // Find game
+              const foundGame = await FindGame(games, "coop", 1, data.code);
+              if (foundGame) {
+                this.g = foundGame;
+              } else {
+                // Create game
+                this.g = new CoopGame(data.code);
+                games.push(this.g);
+              }
+            } else {
+              throw new Error("Invalid game mode requested: " + data.mode);
+            }
+          }
+
+          if (!this.g) {
+            throw new Error("Unknown error: Game not found or created");
+          }
 
           // Attach player to game
           this.g.addPlayer(this);
@@ -94,10 +129,7 @@ class Player {
           // Mark player ready
           this.ready = true;
 
-          // Start player loop
-          loop();
-
-          // Why?
+          // Notify server that everything is ready
           this.socket.send(JSON.stringify({ ready: true }));
         }
       } else if (data?.packet === "key") {
@@ -120,6 +152,7 @@ class Player {
   public setNickname(nickname: string) {
     this.nickname = nickname;
   }
+
   private constructState(id: string | null) {
     return {
       Score: 0,
@@ -133,9 +166,6 @@ class Player {
   }
 
   public setGame(g: Game | null) {
-    if (g !== null) {
-      this.state = this.constructState(g.getId());
-    }
     this.g = g;
   }
 
@@ -145,12 +175,14 @@ class Player {
     this.writeHighscore();
     this.sendMessage(JSON.stringify(this.state));
   }
+
   public setLines(newLines: number) {
     this.state.Lines = newLines;
     this.state.Updated = Date.now();
     this.writeHighscore();
     this.sendMessage(JSON.stringify(this.state));
   }
+
   public setLevel(newLevel: number) {
     this.state.Level = newLevel;
     this.state.Updated = Date.now();

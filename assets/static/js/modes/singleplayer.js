@@ -55,10 +55,10 @@ const StartSingleplayer = (nickname, network) => {
   // Run setup in "background"
   setTimeout(async () => {
     // Set up viewport
-    viewport = new Viewport("#game", "gf", 400, 480);
+    viewport = new Viewport("#singleplayergame", "gf", 400, 480);
     game.setViewport(viewport);
 
-    network.sendPlayerReady(nickname);
+    network.sendPlayerReady(nickname, "singleplayer");
 
     // Start highscore updater
     updateLiveHighscore();

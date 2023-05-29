@@ -19,6 +19,7 @@ class Network {
   async connect(uri, messageCallback, connectCallback, disconnectCallback) {
     // Set up promise
     let resolver;
+
     const done = new Promise((resolve) => {
       resolver = resolve;
     });
@@ -32,8 +33,10 @@ class Network {
     };
 
     this.ws.onopen = () => {
-      resolver();
-      connectCallback;
+      setTimeout(() => {
+        resolver();
+        if (connectCallback) connectCallback();
+      }, 1);
     };
 
     this.ws.onclose = disconnectCallback;
@@ -45,8 +48,8 @@ class Network {
     this.ws.send(JSON.stringify({ packet: "key", data: data }));
   }
 
-  sendPlayerReady(nickname) {
-    this.ws.send(JSON.stringify({ packet: "ready", nickname: nickname }));
+  sendPlayerReady(nickname, mode, code) {
+    this.ws.send(JSON.stringify({ packet: "ready", nickname, mode, code }));
   }
 }
 

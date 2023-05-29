@@ -13,17 +13,24 @@
     <div id="wrapper">
 
       <div class="container view" id="viewModeselect" style="display: none;">
-        <div class="row">
-          <div class="twelve columns">
-            <h5>Select mode</h5>
+        <div class="row d-flex align-items-center justify-content-center">
+          <div class="four columns">
+            <input class="u-full-width" type="text" placeholder="Nickname" id="txtNickname">
+            <h5>Singleplayer</h5>
             <button id="btnSingleplayer">Singleplayer</button>
-            <button id="btnCoop" disabled="disabled">Co-Op</button>
+            <h5>Multiplayer</h5>
+            <label class="example-send-yourself-copy">
+              <input type="checkbox" id="chkPrivate">
+              <span class="label-body">Private game</span>
+            </label>
+            <input class="u-full-width" type="text" placeholder="Code" id="txtCode" style="display:none;">
+            <button id="btnCoop">Co-Op</button>
             <br>
             <br>
             <h5>Instructions</h5>
             <hr>
             <table class="fill">
-              <tr>
+              <tar>
                 <td>Move left</td>
                 <td class="align-right"><code>Left</code></td>
               </tr>
@@ -49,65 +56,25 @@
               </tr>
             </table>
           </div>
+          <div class="four columns">
+            <h5>Single Player High score</h5>
+            <hr>
+            <div id="hsSingleplayerAth">
+            </div>
+          </div>
+          <div class="four columns">
+            <h5>Co-Op High score</h5>
+            <hr>
+            <div id="hsCoopAth">
+            </div>
+          </div>
         </div>
       </div>
-    
-  <div class="container view" id="viewSingleplayer" style="display: none;">
-    <div class="row">
-      <div class="four columns">
-        <input class="u-full-width" type="text" placeholder="Nickname" id="txtSingleplayerNickname">
-        <span id="message" class="hidden">Testerr</span>
-        <button id="btnSingleplayerStart">Start game</button>
-        <br>
-        <br>
-        <h5>Instructions</h5>
-        <hr>
-        <table class="fill">
-         <tr>
-           <td>Move left</td>
-           <td class="align-right"><code>Left</code></td>
-         </tr>
-         <tr>
-           <td>Move right</td>
-           <td class="align-right"><code>Right</code></td>
-         </tr>
-         <tr>
-           <td>CW rotation</td>
-           <td class="align-right"><code>Up</code> or <code>A</code></td>
-         </tr>
-         <tr>
-           <td>CCW rotation</td>
-           <td class="align-right"><code>D</code></td>
-         </tr>
-         <tr>
-           <td>Soft drop</td>
-           <td class="align-right"><code>Down</code></td>
-         </tr>
-         <tr>
-           <td>Hard drop</td>
-           <td class="align-right"><code>Space</code></td>
-         </tr>
-        </table>
-      </div>
-      <div class="four columns">
-        <h5>All time high</h5>
-        <hr>
-        <div id="hsSingleplayerAth">
-        </div>
-      </div>
-      <div class="four columns">
-        <h5>Last 7 days</h5>
-        <hr>
-        <div id="hsSingleplayerWeek">
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="container view" id="viewSingleplayerGame" style="display: none;">
     <div class="row">
       <div class="eight columns">
-        <div id="game"></div>
+        <div id="singleplayergame"></div>
       </div>
       <div class="four columns">
         <h5>Live Highscore (24h)</h5>
@@ -117,67 +84,10 @@
     </div>
   </div>
 
-  <div class="container view" id="viewCoop" style="display: none;">
-    <div class="row">
-      <div class="four columns">
-        <input class="u-full-width" type="text" placeholder="Nickname" id="txtCoopNickname">
-        <span id="message" class="hidden">Testerr</span>
-        <button id="btnCoopStart">Start game</button>
-        <br>
-        <br>
-        <h5>Instructions</h5>
-        <hr>
-        <table class="fill">
-         <tr>
-           <td>Move left</td>
-           <td class="align-right"><code>Left</code></td>
-         </tr>
-         <tr>
-           <td>Move right</td>
-           <td class="align-right"><code>Right</code></td>
-         </tr>
-         <tr>
-           <td>CW rotation</td>
-           <td class="align-right"><code>Up</code> or <code>A</code></td>
-         </tr>
-         <tr>
-           <td>CCW rotation</td>
-           <td class="align-right"><code>D</code></td>
-         </tr>
-         <tr>
-           <td>Soft drop</td>
-           <td class="align-right"><code>Down</code></td>
-         </tr>
-         <tr>
-           <td>Hard drop</td>
-           <td class="align-right"><code>Space</code></td>
-         </tr>
-        </table>
-      </div>
-      <div class="four columns">
-        <h5>All time high</h5>
-        <hr>
-        <div id="hsCoopAth">
-        </div>
-      </div>
-      <div class="four columns">
-        <h5>Last 7 days</h5>
-        <hr>
-        <div id="hsCoopWeek">
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="container view" id="viewCoopGame" style="display: none;">
     <div class="row">
-      <div class="eight columns">
-        <div id="game"></div>
-      </div>
-      <div class="four columns">
-        <h5>Live Highscore (24h)</h5>
-        <hr>
-        <div id="hsCoopToday"></div>
+      <div class="twelve columns">
+        <div id="coopgame"></div>
       </div>
     </div>
   </div>
@@ -216,7 +126,7 @@
         <h5>Game over</h5>
         <hr>
         <div id="hsCoopYourScore">
-          <!-- Your score details will be dynamically added here -->
+          <!-- Your score will be dynamically added here -->
         </div>
         <button id="btnCoopMainMenu">Main Menu</button>
       </div>
@@ -252,6 +162,22 @@
     <div class="row">
       <div class="twelve columns d-flex align-items-center justify-content-center">
         <p><h1>DETRIS</h1></p>
+        <div class="text-center">
+            <div class="cssload-tetrominos">
+              <div class="cssload-tetromino cssload-box1"></div>
+              <div class="cssload-tetromino cssload-box2"></div>
+              <div class="cssload-tetromino cssload-box3"></div>
+              <div class="cssload-tetromino cssload-box4"></div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewStarting" style="display: none;">
+    <div class="row">
+      <div class="twelve columns d-flex align-items-center justify-content-center">
+        <p><h4 id="txtStatus">Waiting for players ...</h4></p>
         <div class="text-center">
             <div class="cssload-tetrominos">
               <div class="cssload-tetromino cssload-box1"></div>

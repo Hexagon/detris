@@ -36,15 +36,14 @@ export class SinglePlayerGame extends Game {
 
   timerReal: Date;
   timerModified: Date;
-  initializationTime: number;
 
   /**
    * Creates a new SinglePlayerGame instance.
    */
-  constructor() {
-    super("singleplayer");
+  constructor(code?: string) {
+    super("singleplayer", code);
 
-    this.grid = new GameGrid();
+    this.grid = new GameGrid(10, 22);
     this.factory = new TetrominoFactory();
     this.Tetrominoes = [];
 
@@ -67,23 +66,13 @@ export class SinglePlayerGame extends Game {
 
     this.nextTetromino();
 
-    // Used as the highscore key
-    this.initializationTime = Date.now();
-
     // Initial game update
     this.changed();
   }
 
   checkRequirements(): boolean {
     // Check player count
-    if (this.listPlayers().length !== 1) {
-      throw new Error("Wrong number of players for a single player game");
-    }
-
-    return true;
-  }
-
-  start(): void {
+    return (this.listPlayers().length === 1);
   }
 
   playerControl(_player: Player, key: string, state: boolean) {
@@ -99,8 +88,6 @@ export class SinglePlayerGame extends Game {
   }
 
   changed(): void {
-    this.incrementChange();
-
     const currentSprite = this.Tetrominoes[0].Sprites[this.Rotation].Data;
 
     const bogusPosition: Vector = { ...this.Position };
@@ -142,11 +129,7 @@ export class SinglePlayerGame extends Game {
 
     return false;
   }
-
-  setKeyStates(kss: Map<string, boolean>): void {
-    this.keyStates = kss;
-  }
-
+  
   private setKey(key: string, state: boolean): void {
     if (state) {
       switch (key) {
@@ -257,6 +240,7 @@ export class SinglePlayerGame extends Game {
 
     // End condition ?
     if (clearedRows == -1) {
+      this.status = "gameover";
       return false;
     }
 

@@ -1,5 +1,7 @@
 import type { Player } from "../server/player.ts";
 
+export type GameStatus = "created" | "playing" | "gameover" | "abandoned";
+
 /**
  * Represents a generic game that can handle different game modes and manage multiple players.
  *
@@ -8,42 +10,71 @@ import type { Player } from "../server/player.ts";
  * @typeparam TMode The type of game mode.
  */
 export class Game {
+  private mode: string;
+  private code?: string;
+  private status: GameStatus;
   private players: Player[] = [];
   private gameId = crypto.randomUUID();
-  private changeId = 0;
+  private initializationTime: number;
+  private cleanupTimer?: number;
 
   /**
    * Creates a new Game instance.
-   * @param gameId The ID of the game.
+   * @param mode Current game mode
    */
   constructor(
-    private mode: string,
+    mode: string,
+    code?: string,
   ) {
-    // Initialize the game instance
+    this.mode = mode;
+    this.code = code;
+    this.status = "created";
+    this.initializationTime = Date.now();
   }
 
-  /**
-   * Adds a player to the game.
-   * @param player The player to add.
-   */
-  incrementChange(): void {
-    this.changeId += 1;
+  over(): void {
+    this.status = "gameover";
+    this.broadcast({ gameOver: true })
   }
 
-  /**
-   * Adds a player to the game.
-   * @param player The player to add.
-   */
-  getChangeId(): number {
-    return this.changeId;
+  broadcast(m: unknown) {
+    throw new Error("Broadcast not implemented")
   }
 
-  /**
-   * Adds a player to the game.
-   * @param player The player to add.
-   */
+  abandon(): void {
+    this.status = "abandoned";
+  }
+
+  start(): void {
+    this.status = "playing";
+  }
+
   getData(): unknown {
     throw new Error("getData not implemented");
+  }
+
+  getStatus(): GameStatus {
+    return this.status;
+  }
+
+  getMode(): unknown {
+    return this.mode;
+  }
+
+  getCode(): unknown {
+    return this.code;
+  }
+
+  setCleanupTimer(): void {
+    if (!this.cleanupTimer) this.cleanupTimer = Date.now();
+  }
+
+  getCleanupTimer(): number | undefined {
+    return this.cleanupTimer;
+  }
+
+  getCreateTime(): number {
+    return this.initializationTime;
   }
 
   /**
@@ -95,12 +126,5 @@ export class Game {
   /** Receive controller update from player */
   iterate(): boolean {
     throw new Error("iterate not implemented");
-  }
-
-  /**
-   * Starts the game.
-   */
-  start(): void {
-    throw new Error("start not implemented");
   }
 }

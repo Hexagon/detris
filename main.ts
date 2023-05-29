@@ -6,14 +6,68 @@ import { join, resolve } from "https://deno.land/std@0.184.0/path/mod.ts";
 
 import { Player } from "./server/player.ts";
 import { Router } from "./server/router.ts";
+import { Game } from "./game/game.ts";
 
+// Main game loop
+const games: Game[] = [];
+const MainLoop = () => {
+  // Wrap the full main login in a try catch
+  try {
+    for (const game of games) {
+      // Start created games when requirements are met
+      if (game.getStatus() === "created") {
+        // Start if requirements are met
+        if (game.checkRequirements()) {
+          game.start();
+
+          // Abandon game if not started after 120 seconds
+        } else if (game.getCreateTime() < Date.now() - 120_000) {
+          game.abandon();
+        }
+      }
+
+      // Iterate games when playing
+      if (game.getStatus() === "playing") {
+        if (!game.iterate()) {
+          // ToDo: Broadcast gameOver: true here
+          game.over();
+        }
+      }
+
+      // Cleanup ended games
+      const ended = game.getStatus() == "gameover" ||
+        game.getStatus() == "abandoned";
+      if (ended) {
+        game.setCleanupTimer();
+
+        // Remove current game if it was ended more than 120 seconds ago
+        if (
+          game.getCleanupTimer() &&
+          game.getCleanupTimer() as number < Date.now() - 120_000
+        ) {
+          console.log("Cleaning up old game");
+          games.splice(games.indexOf(game), 1);
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Main Loop Error: ", e);
+  }
+
+  // Recurse
+  setTimeout(() => {
+    MainLoop();
+  }, 50);
+};
+
+// HTTP server
 serve((req: Request) => {
   let pathname = new URL(req.url).pathname;
 
   // Serve using websockets
   if (req.headers.get("upgrade") == "websocket") {
     const { socket, response } = Deno.upgradeWebSocket(req);
-    new Player(socket);
+    new Player(socket, games);
     return response;
   }
 
@@ -25,3 +79,5 @@ serve((req: Request) => {
   if (pathname === "/") pathname = "/index.html";
   return serveFile(req, resolve(join("./assets/", pathname)));
 }, { port: parseInt(Deno.env.get("DETRIS_PORT") || "8080", 10) });
+
+MainLoop();
