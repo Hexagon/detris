@@ -36,7 +36,7 @@ controls.setHandleChange((c) => {
 });
 
 // Generic initialization
-onScreenEvent("aborted", "ok", () => {
+onScreenEvent("aborted", "mainmenu", () => {
   showScreen("modeselect");
 });
 

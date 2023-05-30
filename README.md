@@ -1,9 +1,9 @@
 # detris
 
-detris is a work-in-progress server-side Tetris implementation written in Deno
-TypeScript. It utilizes Deno KV for storage and includes a basic HTML5 client
-for gameplay. This client is lazy, which means all calculations are made
-server-side.
+detris is a server-side Tetris implementation written in Deno TypeScript
+featuring multiple game modes (currently Single player or Co-Op). It utilizes
+Deno KV for storage and includes a basic HTML5 client for gameplay. The client
+is lazy, which means all calculations are made server-side.
 
 Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 

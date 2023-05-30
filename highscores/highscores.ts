@@ -60,25 +60,6 @@ export async function read(mode: string): Promise<HighscoreMessage | null> {
   return { ath: ath.slice(0, 9), week: week.slice(0, 9), now: Date.now() };
 }
 
-// Used temporarily to migrate old scores
-export async function old(): Promise<{ key: Deno.KvKey; value: Highscore }[]> {
-  const oldScores: { key: Deno.KvKey; value: Highscore }[] = [];
-
-  // 365 days before now
-  const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000 * 365;
-
-  for await (
-    const entry of kv.list({
-      start: ["highscores", oneDayBefore],
-      end: ["highscores", Date.now() + 1],
-    })
-  ) {
-    oldScores.push(entry as { key: Deno.KvKey; value: Highscore });
-  }
-
-  return oldScores;
-}
-
 export async function readPlaying(
   mode: string,
 ): Promise<HighscoreMessageNow | null> {

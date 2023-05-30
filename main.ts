@@ -8,12 +8,6 @@ import { Player } from "./server/player.ts";
 import { Router } from "./server/router.ts";
 import { Game } from "./game/game.ts";
 
-// Migrate old scores
-const oldScores = highscore.old();
-for (const score of await oldScores) {
-  highscore.write("singleplayer", score.value);
-}
-
 // Main game loop
 const games: Game[] = [];
 const MainLoop = () => {

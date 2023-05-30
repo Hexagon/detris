@@ -37,6 +37,8 @@ const elements = {
     coop: document.getElementById("btnCoop"),
     coopstart: document.getElementById("btnCoopStart"),
     coopmainmenu: document.getElementById("btnCoopMainMenu"),
+
+    abortedmainmenu: document.getElementById("btnAbortedMainMenu"),
   },
   containers: {
     /* Mode select view */
@@ -130,6 +132,11 @@ const initializers = {
   coophighscore: () => {
     elements.buttons.coopmainmenu.addEventListener("click", function () {
       events.coophighscore.mainmenu(elements.inputs.nickname.value);
+    });
+  },
+  aborted: () => {
+    elements.buttons.abortedmainmenu.addEventListener("click", function () {
+      events.aborted.mainmenu(elements.inputs.nickname.value);
     });
   },
   singleplayergame: () => {
