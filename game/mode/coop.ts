@@ -17,25 +17,17 @@ export class CoopGame extends Game {
 
   // Base offset of dropping tetromino for player 1
   // Can be outside of grid if current tetromino sprite has blank rows/columns
-  Position1: Vector;
-  GhostPosition1: Vector;
-  Rotation1: number;
-
-  // Base offset of dropping tetromino for player 2
-  // Can be outside of grid if current tetromino sprite has blank rows/columns
-  Position2: Vector;
-  GhostPosition2: Vector;
-  Rotation2: number;
+  Position: Vector[];
+  GhostPosition: Vector[];
+  Rotation: number[];
 
   // Internal stuff below
   Score: number;
   Level: number;
   Lines: number;
-  keyStates1: Map<string, boolean>;
-  keyStates2: Map<string, boolean>;
+  keyStates: Map<string, boolean>[];
 
-  timerReal: Date;
-  timerModified: Date;
+  timerModified: Date[];
   lastScore: number;
 
   /**
@@ -48,16 +40,9 @@ export class CoopGame extends Game {
     this.factory = new TetrominoFactory();
 
     this.Tetrominoes = [];
-    this.Tetrominoes[0] = [];
-    this.Tetrominoes[1] = [];
-
-    this.Position1 = { X: 0, Y: 0 };
-    this.GhostPosition1 = { X: 0, Y: 0 };
-    this.Rotation1 = 0;
-
-    this.Position2 = { X: 0, Y: 0 };
-    this.GhostPosition2 = { X: 0, Y: 0 };
-    this.Rotation2 = 0;
+    this.Position = [];
+    this.GhostPosition = [];
+    this.Rotation = [];
 
     this.Score = 0;
     this.Level = 0;
@@ -66,26 +51,29 @@ export class CoopGame extends Game {
     // Keep track if score has changed since last call to scoreChanged()
     this.lastScore = -1;
 
-    this.keyStates1 = new Map<string, boolean>();
-    this.keyStates2 = new Map<string, boolean>();
-
-    this.timerReal = new Date();
-    this.timerModified = new Date();
-
+    this.keyStates = [];
+    this.timerModified = [];
     this.grid.Clear();
 
-    this.Tetrominoes[0][1] = this.factory.Next();
-    this.Tetrominoes[0][2] = this.factory.Next();
-    this.Tetrominoes[0][3] = this.factory.Next();
-    this.nextTetromino(0);
+    for (let i = 0; i < 2; i++) {
+      this.Tetrominoes.push([]);
+      this.Position.push({ X: 0, Y: 0 });
+      this.GhostPosition.push({ X: 0, Y: 0 });
+      this.Rotation.push(0);
 
-    this.Tetrominoes[1][1] = this.factory.Next();
-    this.Tetrominoes[1][2] = this.factory.Next();
-    this.Tetrominoes[1][3] = this.factory.Next();
-    this.nextTetromino(1);
+      this.keyStates.push(new Map<string, boolean>());
 
-    // Initial game update
-    this.changed();
+      this.timerModified[i] = new Date();
+
+      this.Tetrominoes[i][1] = this.factory.Next();
+      this.Tetrominoes[i][2] = this.factory.Next();
+      this.Tetrominoes[i][3] = this.factory.Next();
+
+      this.nextTetromino(i);
+
+      // Initial game update
+      this.changed(i);
+    }
   }
 
   checkRequirements(): boolean {
@@ -94,11 +82,7 @@ export class CoopGame extends Game {
 
   playerControl(player: Player, key: string, state: boolean) {
     const playerIndex = this.listPlayers().indexOf(player);
-    if (playerIndex === 0) {
-      this.setKey(this.keyStates1, key, state, playerIndex);
-    } else if (playerIndex === 1) {
-      this.setKey(this.keyStates2, key, state, playerIndex);
-    }
+    this.setKey(this.keyStates[playerIndex], key, state, playerIndex);
   }
 
   broadcast(m: unknown) {
@@ -107,23 +91,16 @@ export class CoopGame extends Game {
     }
   }
 
-  changed(): void {
-    const currentSprite1 = this.Tetrominoes[0][0].Sprites[this.Rotation1].Data;
-    const currentSprite2 = this.Tetrominoes[1][0].Sprites[this.Rotation2].Data;
+  changed(playerIndex: number): void {
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data;
 
-    const bogusPosition1: Vector = { ...this.Position1 };
-    const bogusPosition2: Vector = { ...this.Position2 };
+    const bogusPosition: Vector = { ...this.Position[playerIndex] };
+    bogusPosition.Y += 1;
 
-    bogusPosition1.Y += 1;
-    while (this.validMove(currentSprite1, bogusPosition1)) {
-      this.GhostPosition1 = structuredClone(bogusPosition1);
-      bogusPosition1.Y += 1;
-    }
-
-    bogusPosition2.Y += 1;
-    while (this.validMove(currentSprite2, bogusPosition2)) {
-      this.GhostPosition2 = structuredClone(bogusPosition2);
-      bogusPosition2.Y += 1;
+    while (this.validMove(currentSprite, bogusPosition)) {
+      this.GhostPosition[playerIndex] = structuredClone(bogusPosition);
+      bogusPosition.Y += 1;
     }
 
     this.broadcast(this.getData());
@@ -131,39 +108,32 @@ export class CoopGame extends Game {
 
   getData(): unknown {
     return {
-      Position1: this.Position1,
-      Position2: this.Position2,
+      Position1: this.Position[0],
+      Position2: this.Position[1],
       Level: this.Level,
       Lines: this.Lines,
       Score: this.Score,
-      GhostPosition1: this.GhostPosition1,
-      GhostPosition2: this.GhostPosition2,
-      Rotation1: this.Rotation1,
-      Rotation2: this.Rotation2,
+      GhostPosition1: this.GhostPosition[0],
+      GhostPosition2: this.GhostPosition[1],
+      Rotation1: this.Rotation[0],
+      Rotation2: this.Rotation[1],
       Tetrominoes: this.Tetrominoes,
       Grid: this.grid,
     };
   }
 
   moveX(d: number, playerIndex: number): boolean {
-    this.resetTimerIfLanded(playerIndex);
+    this.resetTimerIfLanded(playerIndex); // Assuming resetTimerIfLanded() method is implemented in Game class
 
-    const currentSprite = this.Tetrominoes[playerIndex][0].Sprites[
-      playerIndex === 0 ? this.Rotation1 : this.Rotation2
-    ].Data;
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data;
 
-    const bogusPosition: Vector = playerIndex === 0
-      ? { ...this.Position1 }
-      : { ...this.Position2 };
+    const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.X += d;
 
     if (this.validMove(currentSprite, bogusPosition)) {
-      if (playerIndex === 0) {
-        this.Position1 = structuredClone(bogusPosition);
-      } else {
-        this.Position2 = structuredClone(bogusPosition);
-      }
-      this.changed();
+      this.Position[playerIndex] = structuredClone(bogusPosition);
+      this.changed(playerIndex);
       return true;
     }
 
@@ -214,43 +184,37 @@ export class CoopGame extends Game {
 
   iterate(): boolean {
     const currentTime = new Date().getTime();
-    const timeDifference = currentTime - this.timerModified.getTime();
     const iterateDelay = this.iterateDelayMs();
-    if (timeDifference > iterateDelay) {
-      this.timerReal = new Date();
-      this.timerModified = new Date();
-
-      if (!this.moveDown(0)) {
-        return this.lockdown(0);
-      }
-
-      if (!this.moveDown(1)) {
-        return this.lockdown(1);
+    for (
+      let playerIndex = 0;
+      playerIndex < this.listPlayers().length;
+      playerIndex++
+    ) {
+      const timeDifference = currentTime -
+        this.timerModified[playerIndex].getTime();
+      if (timeDifference > iterateDelay) {
+        this.timerModified[playerIndex] = new Date();
+        if (!this.moveDown(playerIndex)) {
+          const lockDownResult = this.lockdown(playerIndex);
+          if (!lockDownResult) return lockDownResult;
+        }
       }
     }
-
     return true;
   }
 
   moveDown(playerIndex: number): boolean {
-    const currentSprite = this.Tetrominoes[playerIndex][0].Sprites[
-      playerIndex === 0 ? this.Rotation1 : this.Rotation2
-    ].Data;
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data;
 
-    const bogusPosition: Vector = playerIndex === 0
-      ? { ...this.Position1 }
-      : { ...this.Position2 };
+    const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.Y += 1;
 
     this.resetTimerIfLanded(playerIndex);
 
     if (this.validMove(currentSprite, bogusPosition)) {
-      if (playerIndex === 0) {
-        this.Position1 = structuredClone(bogusPosition);
-      } else {
-        this.Position2 = structuredClone(bogusPosition);
-      }
-      this.changed();
+      this.Position[playerIndex] = structuredClone(bogusPosition);
+      this.changed(playerIndex);
       return true;
     } else {
       return false;
@@ -258,13 +222,10 @@ export class CoopGame extends Game {
   }
 
   hasLanded(playerIndex: number): boolean {
-    const currentSprite = this.Tetrominoes[playerIndex][0].Sprites[
-      playerIndex === 0 ? this.Rotation1 : this.Rotation2
-    ].Data;
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data;
 
-    const bogusPosition: Vector = playerIndex === 0
-      ? { ...this.Position1 }
-      : { ...this.Position2 };
+    const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.Y += 1;
 
     if (this.validMove(currentSprite, bogusPosition)) {
@@ -275,23 +236,16 @@ export class CoopGame extends Game {
   }
 
   drop(playerIndex: number): void {
-    const currentSprite = this.Tetrominoes[playerIndex][0].Sprites[
-      playerIndex === 0 ? this.Rotation1 : this.Rotation2
-    ].Data;
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data;
 
-    const bogusPosition: Vector = playerIndex === 0
-      ? { ...this.Position1 }
-      : { ...this.Position2 };
+    const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.Y += 1;
 
     let dropOffset = 0;
 
     while (this.validMove(currentSprite, bogusPosition)) {
-      if (playerIndex === 0) {
-        this.Position1 = structuredClone(bogusPosition);
-      } else {
-        this.Position2 = structuredClone(bogusPosition);
-      }
+      this.Position[playerIndex] = structuredClone(bogusPosition);
       dropOffset += 1;
       bogusPosition.Y += 1;
     }
@@ -308,12 +262,9 @@ export class CoopGame extends Game {
   }
 
   lockdown(playerIndex: number): boolean {
-    const rotation = playerIndex == 0 ? this.Rotation1 : this.Rotation2;
-    const position = playerIndex == 0 ? this.Position1 : this.Position2;
-
     const clearedRows = this.grid.ApplySprite(
-      this.Tetrominoes[playerIndex][0].Sprites[rotation].Data,
-      position,
+      this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data,
+      this.Position[playerIndex],
       this.Tetrominoes[playerIndex][0].Type,
     );
 
@@ -345,65 +296,54 @@ export class CoopGame extends Game {
     this.nextTetromino(playerIndex);
 
     // Reset drop button
-    const ks = playerIndex == 0 ? this.keyStates1 : this.keyStates2;
-
-    if (ks.get("down")) {
-      ks.set("down", false);
+    if (this.keyStates[playerIndex].get("down")) {
+      this.keyStates[playerIndex].set("down", false);
     }
 
     // Notify that stuf has changed
-    this.changed();
+    this.changed(playerIndex);
 
     return true;
   }
 
   nextTetromino(playerIndex: number): void {
-    if (playerIndex === 0) {
-      this.Position1 = { X: 3, Y: 0 };
-      this.Rotation1 = 0;
-      this.Tetrominoes[0][0] = this.Tetrominoes[0][1];
-      this.Tetrominoes[0][1] = this.Tetrominoes[0][2];
-      this.Tetrominoes[0][2] = this.Tetrominoes[0][3];
-      this.Tetrominoes[0][3] = this.factory.Next();
-    } else if (playerIndex === 1) {
-      this.Position2 = { X: 13, Y: 0 };
-      this.Rotation2 = 0;
-      this.Tetrominoes[1][0] = this.Tetrominoes[1][1];
-      this.Tetrominoes[1][1] = this.Tetrominoes[1][2];
-      this.Tetrominoes[1][2] = this.Tetrominoes[1][3];
-      this.Tetrominoes[1][3] = this.factory.Next();
-    }
+    this.Position[playerIndex] = { X: playerIndex * 10 + 3, Y: 0 };
+    this.Rotation[playerIndex] = 0;
+    this.Tetrominoes[playerIndex][0] = this.Tetrominoes[playerIndex][1];
+    this.Tetrominoes[playerIndex][1] = this.Tetrominoes[playerIndex][2];
+    this.Tetrominoes[playerIndex][2] = this.Tetrominoes[playerIndex][3];
+    this.Tetrominoes[playerIndex][3] = this.factory.Next();
   }
 
   rotate(d: number, playerIndex: number): void {
     this.resetTimerIfLanded(playerIndex);
 
-    const rotation = playerIndex === 0 ? this.Rotation1 : this.Rotation2;
+    let bogusRotation = this.Rotation[playerIndex] + d;
 
-    const currentSprite =
-      this.Tetrominoes[playerIndex][0].Sprites[rotation].Data;
-
-    let bogusRotation = playerIndex === 0 ? this.Rotation1 : this.Rotation2;
-    bogusRotation += d;
     if (bogusRotation < 0) {
-      bogusRotation = this.Tetrominoes[playerIndex][0].Sprites.length - 1;
-    } else if (
-      bogusRotation >= this.Tetrominoes[playerIndex][0].Sprites.length
-    ) {
+      bogusRotation = 4 - 1;
+    } else if (bogusRotation > 4 - 1) {
       bogusRotation = 0;
     }
 
-    const bogusPosition: Vector = playerIndex === 0
-      ? { ...this.Position1 }
-      : { ...this.Position2 };
+    const currentSprite =
+      this.Tetrominoes[playerIndex][0].Sprites[bogusRotation].Data;
 
-    if (this.validMove(currentSprite, bogusPosition)) {
-      if (playerIndex === 0) {
-        this.Rotation1 = bogusRotation;
-      } else {
-        this.Rotation2 = bogusRotation;
+    if (this.validMove(currentSprite, this.Position[playerIndex])) {
+      this.Rotation[playerIndex] = bogusRotation;
+      this.changed(playerIndex);
+      return;
+    }
+
+    for (const kick of [-1, 1, -2, 2]) {
+      const bogusPosition: Vector = { ...this.Position[playerIndex] };
+      bogusPosition.X += kick;
+      if (this.validMove(currentSprite, bogusPosition)) {
+        this.Rotation[playerIndex] = structuredClone(bogusRotation);
+        this.Position[playerIndex] = structuredClone(bogusPosition);
+        this.changed(playerIndex);
+        return;
       }
-      this.changed();
     }
   }
 
@@ -450,7 +390,7 @@ export class CoopGame extends Game {
 
   resetTimerIfLanded(playerIndex: number): void {
     if (this.hasLanded(playerIndex)) {
-      this.timerModified = new Date();
+      this.timerModified[playerIndex] = new Date();
     }
   }
 

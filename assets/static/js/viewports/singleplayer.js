@@ -32,10 +32,10 @@ class Viewport {
 
   #drawBackground() {
     const { context, dimensions } = this;
-    context.fillStyle = "rgb(64,64,64)";
+    context.fillStyle = "rgb(32, 33, 34)";
     context.fillRect(80, 10, 220, dimensions.height - 60);
 
-    context.fillStyle = "rgb(32,32,32)";
+    context.fillStyle = "rgb(10, 11, 12)";
     context.fillRect(85, 15, 210, dimensions.height - 70);
   }
 
@@ -88,19 +88,63 @@ class Viewport {
 
   #fillWithGradient(color, px, py) {
     const { context } = this;
-    const grd = context.createRadialGradient(
-      px + 10,
-      py + 10,
-      0,
-      px + 10,
-      py + 10,
-      50,
-    );
-    grd.addColorStop(0, color);
-    grd.addColorStop(1, "rgb(0,0,0)");
+    const size = 19; // size of the block
 
-    context.fillStyle = grd;
-    context.fillRect(px, py, 20, 20);
+    // Draw lighter top edge
+    const topGradient = context.createLinearGradient(px, py, px, py + size);
+    topGradient.addColorStop(0, color[0]);
+    topGradient.addColorStop(1, color[1]);
+    context.fillStyle = topGradient;
+    context.beginPath();
+    context.moveTo(px, py);
+    context.lineTo(px + size, py);
+    context.lineTo(px + size - 5, py + 5);
+    context.lineTo(px + 5, py + 5);
+    context.closePath();
+    context.fill();
+
+    // Draw lighter left edge
+    const leftGradient = context.createLinearGradient(px, py, px + size, py);
+    leftGradient.addColorStop(0, color[0]);
+    leftGradient.addColorStop(1, color[1]);
+    context.fillStyle = leftGradient;
+    context.beginPath();
+    context.moveTo(px, py);
+    context.lineTo(px, py + size);
+    context.lineTo(px + 5, py + size - 5);
+    context.lineTo(px + 5, py + 5);
+    context.closePath();
+    context.fill();
+
+    // Draw darker bottom edge
+    const bottomGradient = context.createLinearGradient(px, py + size, px, py);
+    bottomGradient.addColorStop(0, color[2]);
+    bottomGradient.addColorStop(1, color[1]);
+    context.fillStyle = bottomGradient;
+    context.beginPath();
+    context.moveTo(px, py + size);
+    context.lineTo(px + size, py + size);
+    context.lineTo(px + size - 5, py + size - 5);
+    context.lineTo(px + 5, py + size - 5);
+    context.closePath();
+    context.fill();
+
+    // Draw darker right edge
+    const rightGradient = context.createLinearGradient(px + size, py, px, py);
+    rightGradient.addColorStop(0, color[2]);
+    rightGradient.addColorStop(1, color[1]);
+    context.fillStyle = rightGradient;
+    context.beginPath();
+    context.moveTo(px + size, py);
+    context.lineTo(px + size, py + size);
+    context.lineTo(px + size - 5, py + size - 5);
+    context.lineTo(px + size - 5, py + 5);
+    context.closePath();
+    context.fill();
+
+    // Draw inner square
+    context.fillStyle = color[1];
+    context.fillRect(px + 5, py + 5, size - 10, size - 10);
   }
 
   redraw(gameData) {
