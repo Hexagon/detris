@@ -2,8 +2,6 @@
 
 import { Game } from "../game/game.ts";
 
-import * as highscores from "../highscores/highscores.ts";
-
 import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
 import { CoopGame } from "../game/mode/coop.ts";
 
@@ -129,7 +127,7 @@ class Player {
     try {
       this.socket.send(stringifiedMessage);
     } catch (_e) {
-      console.error("Tried to send to closed socket");
+      /* Ignore */
     }
   }
 

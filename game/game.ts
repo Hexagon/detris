@@ -37,7 +37,7 @@ export class Game {
     this.broadcast({ gameOver: true });
   }
 
-  broadcast(m: unknown) {
+  broadcast(_m: unknown) {
     throw new Error("Broadcast not implemented");
   }
 

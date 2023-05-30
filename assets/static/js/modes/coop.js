@@ -10,9 +10,30 @@ import { Game } from "../common/game.js";
 
 let viewport;
 
-const StartCoop = (nickname, code, network) => {
-  showScreen("loading");
+const gotData = (game) => {
+  let resolver = () => {};
+  let rejecter = () => {};
+  const done = new Promise((resolve, reject) => {
+    resolver = resolve;
+    rejecter = reject;
+  });
+  const timeoutTimer = setTimeout(() => {
+    rejecter();
+  }, 120000);
 
+  setTimeout(async () => {
+    while (!game.getData()) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    clearTimeout(timeoutTimer);
+    resolver();
+  }, 0);
+
+  return done;
+};
+
+const StartCoop = (nickname, code, network) => {
   let game = new Game();
 
   // Run setup in "background"
@@ -23,19 +44,24 @@ const StartCoop = (nickname, code, network) => {
 
     network.sendPlayerReady(nickname, "coop", code);
 
-    // Start playing
-    showScreen("coopgame");
-
     try {
-      await game.play();
-    } catch (_e) {
-      console.error("An error occurred while playing.");
-    }
+      // Wait for data
+      await gotData(game);
 
-    // Get score
-    if (game.getData().Score > 0) {
-      showScreen("coophighscore", game.getData().Score);
-    } else {
+      // Start playing
+      showScreen("coopgame");
+
+      // Play game
+      await game.play();
+
+      // Get score
+      if (game.getData().Score > 0) {
+        showScreen("coophighscore", game.getData().Score);
+      } else {
+        showScreen("aborted");
+      }
+    } catch (_e) {
+      console.error("An error occurred while playing.", _e);
       showScreen("aborted");
     }
 

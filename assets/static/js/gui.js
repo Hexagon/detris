@@ -4,7 +4,7 @@
  * @file js/gui.js
  */
 
-import { htmlEscape } from "./utils.js";
+import { debounce, htmlEscape } from "./utils.js";
 
 // Define all screens and elements
 const elements = {
@@ -56,30 +56,59 @@ const elements = {
 
     /* Co-op highscore view */
     hsCoopYourScore: document.getElementById("hsCoopYourScore"),
-    hsCoopAllTime: document.getElementById("hsSingleplayerAllTime"),
-    hsCoopLast7Days: document.getElementById("hsSingleplayerLast7Days"),
+    hsCoopAllTime: document.getElementById("hsCoopAllTime"),
+    hsCoopLast7Days: document.getElementById("hsCoopLast7Days"),
   },
 };
 
 const events = {};
 
 // Define initializers for each screen
+const validateNickname = (n) => {
+  if (n.length < 2) {
+    return "Nickname too short, need to be at least 2 characters";
+  } else if (n.length > 15) {
+    return "Nickname too long, need to be at most 15 characters";
+  }
+};
 const initializers = {
   modeselect: () => {
     elements.buttons.singleplayer.addEventListener("click", function () {
-      events.modeselect.singleplayer(elements.inputs.nickname.value);
+      const validationResult = validateNickname(elements.inputs.nickname.value);
+      if (validationResult === undefined) {
+        events.modeselect.singleplayer(elements.inputs.nickname.value);
+      }
     });
     elements.buttons.coop.addEventListener("click", function () {
-      events.modeselect.coop(
-        elements.inputs.nickname.value,
-        elements.inputs.code.value,
-      );
+      const validationResult = validateNickname(elements.inputs.nickname.value);
+      if (validationResult === undefined) {
+        events.modeselect.coop(
+          elements.inputs.nickname.value,
+          elements.inputs.code.value,
+        );
+      }
+    });
+    elements.inputs.nickname.addEventListener("keyup", () => {
+      debounce("nicknameValidation", () => {
+        const validationResult = validateNickname(
+          elements.inputs.nickname.value,
+        );
+        if (validationResult !== undefined) {
+          console.warn("Nickname validation error: " + validationResult);
+          elements.inputs.nickname.className =
+            elements.inputs.nickname.className + " validation-failed";
+        } else {
+          elements.inputs.nickname.className = elements.inputs.nickname
+            .className.replace(/validation\-failed/g, "");
+        }
+      });
     });
     elements.inputs.checkprivate.addEventListener("change", function (e) {
-      if (e.checked) {
-        elements.inputs.code.style.display = "none";
-      } else {
+      if (e && e.target && e.target.checked) {
         elements.inputs.code.style.display = "block";
+      } else {
+        elements.inputs.code.value = "";
+        elements.inputs.code.style.display = "none";
       }
     });
   },
@@ -141,6 +170,36 @@ const updaters = {
     };
     xhr.send();
 
+    // Fetch highscore
+    const xhrCoop = new XMLHttpRequest();
+    xhrCoop.open("GET", "api/highscores/coop");
+    xhrCoop.onload = function () {
+      if (xhrCoop.status === 200) {
+        const res = JSON.parse(xhrCoop.responseText);
+        let html = "";
+        let current = 0;
+        const max = 10;
+        if (res.ath) {
+          res.ath.forEach(function (hs) {
+            const playingClass = (Date.parse(hs.ts) > Date.now() - 10_000)
+              ? " playing"
+              : "";
+            if (current++ < max) {
+              html += '<div class="highscore-entry' + playingClass +
+                '"><h5 class="right no-margin">' +
+                htmlEscape(hs.score) +
+                '</h5><h5 class="no-margin">' +
+                htmlEscape(hs.nickname) +
+                "</h5></div>";
+            }
+          });
+        }
+
+        elements.containers.hsCoopAth.innerHTML = html;
+      }
+    };
+    xhrCoop.send();
+
     // Focus on nickname
     elements.inputs.nickname.focus();
   },
@@ -192,6 +251,58 @@ const updaters = {
         }
 
         elements.containers.hsSingleplayerLast7Days.innerHTML = html;
+      }
+    };
+    xhr.send();
+  },
+  coophighscore: (score) => {
+    // Update your score details
+    elements.containers.hsCoopYourScore.innerHTML = `
+      <h5>Your Score: ${score}</h5>
+      <!-- Additional score details -->
+    `;
+
+    // Fetch highscore
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "api/highscores/coop");
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText);
+        let html = "";
+        let current = 0;
+        const max = 10;
+        if (res.ath) {
+          res.ath.forEach(function (hs) {
+            if (current++ < max) {
+              html +=
+                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                htmlEscape(hs.score) +
+                '</h5><h5 class="no-margin">' +
+                htmlEscape(hs.nickname) +
+                "</h5></div>";
+            }
+          });
+        }
+
+        elements.containers.hsCoopAllTime.innerHTML = html;
+
+        html = "";
+        current = 0;
+
+        if (res.week) {
+          res.week.forEach(function (hs) {
+            if (current++ < max) {
+              html +=
+                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                htmlEscape(hs.score) +
+                '</h5><h5 class="no-margin">' +
+                htmlEscape(hs.nickname) +
+                "</h5></div>";
+            }
+          });
+        }
+
+        elements.containers.hsCoopLast7Days.innerHTML = html;
       }
     };
     xhr.send();

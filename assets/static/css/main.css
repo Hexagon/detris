@@ -102,9 +102,14 @@ html {
     left: 50%;
     top: 50%;
     margin-left:-480px;
-    margin-top:-240px;
+    margin-top:-260px;
     width: 960px;
     min-height: 480px;
+  }
+
+  input.validation-failed {
+    background-color:#DD6666;
+    color: crimson;
   }
   
   #txtNickname {
@@ -113,7 +118,7 @@ html {
   
   #game {
     width: 640px;
-    height: 480px;
+    height: 550px;
     margin-left: 160px;
   }
   

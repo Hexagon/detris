@@ -62,7 +62,6 @@ export async function read(mode: string): Promise<HighscoreMessage | null> {
 
 // Used temporarily to migrate old scores
 export async function old(): Promise<{ key: Deno.KvKey; value: Highscore }[]> {
-  // deno-lint-ignore no-explicit-any
   const oldScores: { key: Deno.KvKey; value: Highscore }[] = [];
 
   // 365 days before now

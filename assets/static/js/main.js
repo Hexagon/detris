@@ -40,7 +40,6 @@ onScreenEvent("aborted", "ok", () => {
   showScreen("modeselect");
 });
 
-// Show mode select screen
 showScreen("modeselect");
 onScreenEvent("modeselect", "singleplayer", (nickname) => {
   showScreen("loading");

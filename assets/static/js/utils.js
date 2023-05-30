@@ -17,3 +17,9 @@ export function htmlEscape(str) {
   }
   return "";
 }
+
+const debounceMap = new Map();
+export function debounce(id, fn, delay = 150) {
+  if (debounceMap.has(id)) clearTimeout(debounceMap.get(id));
+  debounceMap.set(id, setTimeout(fn, delay));
+}

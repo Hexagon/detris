@@ -48,8 +48,6 @@ const updateLiveHighscore = () => {
 };
 
 const StartSingleplayer = (nickname, network) => {
-  showScreen("loading");
-
   let game = new Game();
 
   // Run setup in "background"

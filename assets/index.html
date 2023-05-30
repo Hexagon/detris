@@ -13,21 +13,16 @@
     <div id="wrapper">
 
       <div class="container view" id="viewModeselect" style="display: none;">
-        <div class="row d-flex align-items-center justify-content-center">
+        <div>
           <div class="four columns">
             <input class="u-full-width" type="text" placeholder="Nickname" id="txtNickname">
-            <h5>Singleplayer</h5>
-            <button id="btnSingleplayer">Singleplayer</button>
-            <h5>Multiplayer</h5>
+            <button id="btnSingleplayer">New Singleplayer Game</button>
             <label class="example-send-yourself-copy">
               <input type="checkbox" id="chkPrivate">
               <span class="label-body">Private game</span>
             </label>
             <input class="u-full-width" type="text" placeholder="Code" id="txtCode" style="display:none;">
-            <button id="btnCoop">Co-Op</button>
-            <br>
-            <br>
-            <h5>Instructions</h5>
+            <button id="btnCoop">New Co-Op Game</button>
             <hr>
             <table class="fill">
               <tar>
@@ -177,7 +172,7 @@
   <div class="container view" id="viewStarting" style="display: none;">
     <div class="row">
       <div class="twelve columns d-flex align-items-center justify-content-center">
-        <p><h4 id="txtStatus">Waiting for players ...</h4></p>
+        <p><h4 id="txtStatus">Waiting for players (1/2) ...</h4></p>
         <div class="text-center">
             <div class="cssload-tetrominos">
               <div class="cssload-tetromino cssload-box1"></div>

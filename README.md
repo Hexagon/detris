@@ -7,6 +7,8 @@ server-side.
 
 Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 
+## Getting Started
+
 To set up the development environment, follow the steps below:
 
 1. Clone this repository to your desired workspace:
@@ -17,7 +19,7 @@ git clone https://github.com/Hexagon/detris.git
 cd detris
 ```
 
-2. Start the server using Deno. The --unstable flag is required as Deno KV is
+2. Start the server using Deno. The `--unstable` flag is required as Deno KV is
    not yet stabilized:
 
 ```bash

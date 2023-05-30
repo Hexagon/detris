@@ -37,6 +37,8 @@ class Network {
         resolver();
         if (connectCallback) connectCallback();
       }, 1);
+
+      this.keepAlive();
     };
 
     this.ws.onclose = disconnectCallback;
@@ -45,11 +47,27 @@ class Network {
   }
 
   sendControlsChange(data) {
-    this.ws.send(JSON.stringify({ packet: "key", data: data }));
+    if (this.ws.readyState == this.ws.OPEN) {
+      this.ws.send(JSON.stringify({ packet: "key", data: data }));
+    }
   }
 
   sendPlayerReady(nickname, mode, code) {
-    this.ws.send(JSON.stringify({ packet: "ready", nickname, mode, code }));
+    if (this.ws.readyState == this.ws.OPEN) {
+      this.ws.send(JSON.stringify({ packet: "ready", nickname, mode, code }));
+    }
+  }
+
+  // Try to keep connection alive as long as possible
+  keepAlive() {
+    if (this.ws.readyState == this.ws.OPEN) {
+      this.ws.send(JSON.stringify({ keepAlive: true }));
+
+      // Recurse
+      setTimeout(() => {
+        this.keepAlive();
+      }, 20_000);
+    }
   }
 }
 

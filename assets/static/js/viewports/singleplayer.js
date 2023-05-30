@@ -55,72 +55,52 @@ class Viewport {
     const dx = position.X;
     const dy = position.Y;
 
-    // Loop over all sprite indexes (si == sprite index)
     for (let si = 0; si < tetromino.Sprites[rotation].Data.length; si++) {
       const currentSprite = tetromino.Sprites[rotation].Data[si];
 
-      // Destination position in pixels
       if (dy + currentSprite.Y > 1) {
         const px = 90 + (dx + currentSprite.X) * 20;
         const py = 20 + (dy + currentSprite.Y - 2) * 20;
-
-        // Create gradient
-        const grd = context.createRadialGradient(
-          px + 10,
-          py + 10,
-          0,
-          px + 10,
-          py + 10,
-          50,
-        );
-        grd.addColorStop(0, game.colors[tetromino.Type]);
-        grd.addColorStop(1, "rgb(0,0,0)");
-
-        // Fill with gradient
-        if (ghost) {
-          context.save();
-          context.globalAlpha = 0.3;
-          context.fillStyle = grd;
-          context.fillRect(px, py, 20, 20);
-          context.restore();
-        } else {
-          context.fillStyle = grd;
-          context.fillRect(px, py, 20, 20);
-        }
+        context.save();
+        if (ghost) context.globalAlpha = 0.3;
+        this.#fillWithGradient(game.colors[tetromino.Type], px, py);
+        context.restore();
       }
     }
   }
 
   #drawData(game) {
-    const { context } = this;
     if (game && game.data && game.data.Grid && game.data.Grid.Data) {
       const data = game.data.Grid.Data;
 
       for (let y = 0; y < 22; y++) {
         for (let x = 0; x < 10; x++) {
-          // First two rows are hidden
           if (y > 1 && data[x + y * 10]) {
             const px = 90 + x * 20;
             const py = 20 + (y - 2) * 20;
 
-            // Create gradient
-            const grd = context.createRadialGradient(
-              px + 10,
-              py + 10,
-              0,
-              px + 10,
-              py + 10,
-              50,
-            );
-            grd.addColorStop(0, game.colors[data[x + y * 10]]);
-            grd.addColorStop(1, "rgb(0,0,0)");
-
-            context.fillStyle = grd;
-            context.fillRect(px, py, 20, 20);
+            this.#fillWithGradient(game.colors[data[x + y * 10]], px, py);
           }
         }
       }
     }
+  }
+
+  #fillWithGradient(color, px, py) {
+    const { context } = this;
+    const grd = context.createRadialGradient(
+      px + 10,
+      py + 10,
+      0,
+      px + 10,
+      py + 10,
+      50,
+    );
+    grd.addColorStop(0, color);
+    grd.addColorStop(1, "rgb(0,0,0)");
+
+    context.fillStyle = grd;
+    context.fillRect(px, py, 20, 20);
   }
 
   redraw(gameData) {
