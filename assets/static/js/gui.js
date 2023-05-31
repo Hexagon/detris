@@ -20,6 +20,10 @@ const elements = {
     loading: document.getElementById("viewLoading"),
     starting: document.getElementById("viewStarting"),
     aborted: document.getElementById("viewAborted"),
+
+    // Battle screen
+    battlegame: document.getElementById("viewBattleGame"),
+    battlehighscore: document.getElementById("viewBattleHighscore"),
   },
   labels: {
     status: document.getElementById("lblStarting"),
@@ -39,6 +43,10 @@ const elements = {
     coopmainmenu: document.getElementById("btnCoopMainMenu"),
 
     abortedmainmenu: document.getElementById("btnAbortedMainMenu"),
+
+    // Battle buttons
+    battle: document.getElementById("btnBattle"),
+    battlemainmenu: document.getElementById("btnBattleMainMenu"),
   },
   containers: {
     /* Mode select view */
@@ -60,6 +68,11 @@ const elements = {
     hsCoopYourScore: document.getElementById("hsCoopYourScore"),
     hsCoopAllTime: document.getElementById("hsCoopAllTime"),
     hsCoopLast7Days: document.getElementById("hsCoopLast7Days"),
+
+    /* Battle highscore view */
+    hsBattleYourScore: document.getElementById("hsBattleYourScore"),
+    hsBattleAllTime: document.getElementById("hsBattleAllTime"),
+    hsBattleLast7Days: document.getElementById("hsBattleLast7Days"),
   },
 };
 
@@ -85,6 +98,15 @@ const initializers = {
       const validationResult = validateNickname(elements.inputs.nickname.value);
       if (validationResult === undefined) {
         events.modeselect.coop(
+          elements.inputs.nickname.value,
+          elements.inputs.code.value,
+        );
+      }
+    });
+    elements.buttons.battle.addEventListener("click", function () {
+      const validationResult = validateNickname(elements.inputs.nickname.value);
+      if (validationResult === undefined) {
+        events.modeselect.battle(
           elements.inputs.nickname.value,
           elements.inputs.code.value,
         );
@@ -132,6 +154,11 @@ const initializers = {
   coophighscore: () => {
     elements.buttons.coopmainmenu.addEventListener("click", function () {
       events.coophighscore.mainmenu(elements.inputs.nickname.value);
+    });
+  },
+  battlehighscore: () => {
+    elements.buttons.battlemainmenu.addEventListener("click", function () {
+      events.battlehighscore.mainmenu(elements.inputs.nickname.value);
     });
   },
   aborted: () => {
@@ -310,6 +337,66 @@ const updaters = {
         }
 
         elements.containers.hsCoopLast7Days.innerHTML = html;
+      }
+    };
+    xhr.send();
+  },
+  battlehighscore: (score) => {
+    // Update your score details
+    if (score === undefined) {
+      elements.containers.hsBattleYourScore.innerHTML = `
+      <h5>You Lost!</h5>
+      <!-- Additional score details -->
+    `;
+    } else {
+      elements.containers.hsBattleYourScore.innerHTML = `
+      <h5>You Won!</h5>
+      <h5>Score: ${score}</h5>
+      <!-- Additional score details -->
+    `;
+    }
+
+    // Fetch highscore
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "api/highscores/battle");
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText);
+        let html = "";
+        let current = 0;
+        const max = 10;
+        if (res.ath) {
+          res.ath.forEach(function (hs) {
+            if (current++ < max) {
+              html +=
+                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                htmlEscape(hs.score) +
+                '</h5><h5 class="no-margin">' +
+                htmlEscape(hs.nickname) +
+                "</h5></div>";
+            }
+          });
+        }
+
+        elements.containers.hsBattleAllTime.innerHTML = html;
+
+        html = "";
+        current = 0;
+
+        if (res.week) {
+          res.week.forEach(function (hs) {
+            if (current++ < max) {
+              html +=
+                '<div class="highscore-entry"><h5 class="right no-margin">' +
+                htmlEscape(hs.score) +
+                '</h5><h5 class="no-margin">' +
+                htmlEscape(hs.nickname) +
+                "</h5></div>";
+            }
+          });
+        }
+
+        elements.containers.hsBattleLast7Days.innerHTML = html;
       }
     };
     xhr.send();

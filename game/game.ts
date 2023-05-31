@@ -1,3 +1,5 @@
+// game/game.ts
+
 import type { Player } from "../server/player.ts";
 
 export type GameStatus = "created" | "playing" | "gameover" | "abandoned";
@@ -13,10 +15,11 @@ export class Game {
   private mode: string;
   private code?: string;
   private status: GameStatus;
-  private players: Player[] = [];
   private gameId = crypto.randomUUID();
   private initializationTime: number;
   private cleanupTimer?: number;
+
+  private players: Player[] = [];
 
   /**
    * Creates a new Game instance.
@@ -49,11 +52,11 @@ export class Game {
     this.status = "playing";
   }
 
-  scoreChanged(): boolean {
+  scoreChanged(_playerIndex?: number): boolean {
     throw new Error("scoreChanged not implemented");
   }
 
-  getData(): unknown {
+  getData(playerIndex?: number): unknown {
     throw new Error("getData not implemented");
   }
 
@@ -65,7 +68,7 @@ export class Game {
     return this.mode;
   }
 
-  getCode(): string {
+  getCode(): string | undefined {
     return this.code;
   }
 
@@ -113,6 +116,21 @@ export class Game {
    */
   listPlayers(): Player[] {
     return this.players;
+  }
+
+  /**
+   * Get player index
+   * @resturns Player index
+   */
+  getPlayerIndex(player: Player): number {
+    return this.players.indexOf(player);
+  }
+
+  /**
+   * Act when player control changes
+   */
+  act(_player: Player, _key: string, _value: boolean): void {
+    throw new Error("act() not implemented in game mode");
   }
 
   /**

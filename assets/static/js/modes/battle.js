@@ -1,10 +1,10 @@
 /**
  * Manages single player game mode
  *
- * @file static/js/modes/coop.js
+ * @file static/js/modes/battle.js
  */
 
-import { Viewport } from "../viewports/coop.js";
+import { Viewport } from "../viewports/battle.js";
 import { showScreen } from "../gui.js";
 import { Game } from "../common/game.js";
 
@@ -34,30 +34,39 @@ const gotData = (game) => {
   return done;
 };
 
-const StartCoop = (nickname, code, network) => {
+const StartBattle = (nickname, code, network) => {
   let game = new Game();
 
   // Run setup in "background"
   setTimeout(async () => {
     // Set up viewport
-    viewport = new Viewport("#coopgame", "gf", 640, 480);
+    viewport = new Viewport("#battlegame", "gf", 640, 480);
     game.setViewport(viewport);
 
-    network.sendPlayerReady(nickname, "coop", code);
+    network.sendPlayerReady(nickname, "battle", code);
 
     try {
       // Wait for data
       await gotData(game);
 
       // Start playing
-      showScreen("coopgame");
+      showScreen("battlegame");
 
       // Play game
+      console.log("Pregame");
       await game.play();
 
+      console.log("Postgame");
       // Get score
-      if (game.getData().Score > 0) {
-        showScreen("coophighscore", game.getData().Score);
+      // ToDo: Currently always showing player 0s score
+      console.log(game.getData());
+      if (game.getData().Winner >= 0) {
+        showScreen(
+          "battlehighscore",
+          game.getData().Winner === game.getData().PlayerIndex
+            ? game.getData().Score[game.getData().PlayerIndex]
+            : undefined,
+        );
       } else {
         showScreen("aborted");
       }
@@ -73,4 +82,4 @@ const StartCoop = (nickname, code, network) => {
   return game;
 };
 
-export { StartCoop };
+export { StartBattle };

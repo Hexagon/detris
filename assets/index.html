@@ -23,6 +23,7 @@
             </label>
             <input class="u-full-width" type="text" placeholder="Code" id="txtCode" style="display:none;">
             <button id="btnCoop">New Co-Op Game</button>
+            <button id="btnBattle">New PvP Game</button>
             <hr>
             <table class="fill">
               <tar>
@@ -65,6 +66,47 @@
           </div>
         </div>
       </div>
+
+      <div class="container view" id="viewBattleGame" style="display: none;">
+    <div class="row">
+      <div class="eight columns">
+        <div id="battlegame"></div>
+      </div>
+      <div class="four columns">
+        <h5>Live Highscore (24h)</h5>
+        <hr>
+        <div id="hsBattleToday"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container view" id="viewBattleHighscore" style="display: none;">
+    <div class="row">
+      <div class="four columns">
+        <h5>Game over</h5>
+        <hr>
+        <div id="hsBattleYourScore">
+          <!-- Your score will be dynamically added here -->
+        </div>
+        <button id="btnBattleMainMenu">Main Menu</button>
+      </div>
+      <div class="four columns">
+        <h5>All Time High</h5>
+        <hr>
+        <div id="hsBattleAllTime">
+          <!-- All-time highscore entries will be dynamically added here -->
+        </div>
+      </div>
+      <div class="four columns">
+        <h5>Last 7 Days</h5>
+        <hr>
+        <div id="hsBattleLast7Days">
+          <!-- Last 7 days highscore entries will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
   <div class="container view" id="viewSingleplayerGame" style="display: none;">
     <div class="row">

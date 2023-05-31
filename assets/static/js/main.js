@@ -10,6 +10,7 @@ import { onScreenEvent, showScreen } from "./gui.js";
 
 import { StartSingleplayer } from "./modes/singleplayer.js";
 import { StartCoop } from "./modes/coop.js";
+import { StartBattle } from "./modes/battle.js";
 
 // Set up game
 let currentGame = undefined;
@@ -18,6 +19,7 @@ let currentGame = undefined;
 const network = new Network();
 const onNetworkMessage = (o) => {
   if (currentGame) {
+    console.log(o);
     if (o.Grid) {
       currentGame.setData(o);
     } else if (o.gameOver) {
@@ -49,6 +51,10 @@ onScreenEvent("modeselect", "coop", (nickname, code) => {
   showScreen("starting");
   currentGame = StartCoop(nickname, code, network);
 });
+onScreenEvent("modeselect", "battle", (nickname, code) => {
+  showScreen("starting");
+  currentGame = StartBattle(nickname, code, network);
+});
 
 // Singleplayer initialization
 onScreenEvent("singleplayerhighscore", "newgame", (nickname) => {
@@ -62,3 +68,6 @@ onScreenEvent(
 
 // Co-Op initialization
 onScreenEvent("coophighscore", "mainmenu", () => showScreen("modeselect"));
+
+// Co-Op initialization
+onScreenEvent("battlehighscore", "mainmenu", () => showScreen("modeselect"));

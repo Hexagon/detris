@@ -1,7 +1,9 @@
+// game/mode/singleplayer.ts
+
 import { Game } from "../game.ts";
 import { Tetromino, TetrominoFactory, Vector } from "../tetromino.ts";
 import { GameGrid } from "../grid.ts";
-import type { Player } from "../../server/player.ts";
+import { Player } from "../../server/player.ts";
 
 /**
  * Represents a single-player game.
@@ -32,7 +34,6 @@ export class SinglePlayerGame extends Game {
   Score: number;
   Level: number;
   Lines: number;
-  keyStates: Map<string, boolean>;
 
   timerReal: Date;
   timerModified: Date;
@@ -59,8 +60,6 @@ export class SinglePlayerGame extends Game {
     // Keep track if score has changed since last call to scoreChanged()
     this.lastScore = -1;
 
-    this.keyStates = new Map<string, boolean>();
-
     this.timerReal = new Date();
     this.timerModified = new Date();
 
@@ -78,11 +77,6 @@ export class SinglePlayerGame extends Game {
   checkRequirements(): boolean {
     // Check player count
     return (this.listPlayers().length === 1);
-  }
-
-  playerControl(_player: Player, key: string, state: boolean) {
-    // This is a single player game, just act
-    this.setKey(key, state);
   }
 
   broadcast(m: unknown) {
@@ -136,7 +130,7 @@ export class SinglePlayerGame extends Game {
     return false;
   }
 
-  private setKey(key: string, state: boolean): void {
+  public act(_player: Player, key: string, state: boolean): void {
     if (state) {
       switch (key) {
         case "right":
@@ -238,6 +232,21 @@ export class SinglePlayerGame extends Game {
   }
 
   lockdown(): boolean {
+    // Double check validity, mostly for multiplayer games where blocks can be "inserted" during the drop delay
+    while (
+      !this.validMove(
+        this.Tetrominoes[0].Sprites[this.Rotation].Data,
+        this.Position,
+      )
+    ) {
+      // Kick up
+      this.Position.Y -= 1;
+      // Not possible?
+      if (this.Position.Y < 0) {
+        return false;
+      }
+    }
+
     const clearedRows = this.grid.ApplySprite(
       this.Tetrominoes[0].Sprites[this.Rotation].Data,
       this.Position,
@@ -272,9 +281,7 @@ export class SinglePlayerGame extends Game {
     this.nextTetromino();
 
     // Reset drop button
-    if (this.keyStates.get("down")) {
-      this.keyStates.set("down", false);
-    }
+    this.listPlayers()[0].setKeyState("down", false);
 
     // Notify that stuf has changed
     this.changed();
@@ -294,7 +301,7 @@ export class SinglePlayerGame extends Game {
 
   resetTimerIfLanded(): void {
     if (this.hasLanded()) {
-      if (Date.now() - this.timerReal.getTime() < 2000) {
+      if (Date.now() - this.timerReal.getTime() < this.iterateDelayMs()) {
         this.timerModified = new Date();
       }
     }

@@ -4,6 +4,7 @@ import { Game } from "../game/game.ts";
 
 import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
 import { CoopGame } from "../game/mode/coop.ts";
+import { BattleGame } from "../game/mode/battle.ts";
 
 const FindGame = async (
   games: Game[],
@@ -49,6 +50,7 @@ class Player {
   private socket: WebSocket;
   private g: Game | null;
   private nickname = "Undef";
+  private controls: { [key: string]: boolean } = {};
 
   // Player is not ready yet!
   private ready = false;
@@ -68,6 +70,7 @@ class Player {
         /* ignore */
       }
 
+      // Server connected
       if (data?.packet === "ready" && data?.mode) {
         const nickname = data.nickname;
         const validationError = this.validateNickname(nickname);
@@ -97,6 +100,17 @@ class Player {
               this.g = new CoopGame(data.code);
               games.push(this.g);
             }
+            // Join Co-Op game
+          } else if (data.mode === "battle") {
+            // Find game
+            const foundGame = await FindGame(games, "battle", 1, data.code);
+            if (foundGame) {
+              this.g = foundGame;
+            } else {
+              // Create game
+              this.g = new BattleGame(data.code);
+              games.push(this.g);
+            }
           } else {
             throw new Error("Invalid game mode requested: " + data.mode);
           }
@@ -114,16 +128,15 @@ class Player {
           // Notify server that everything is ready
           this.socket.send(JSON.stringify({ ready: true }));
         }
+
+        // React to key presses
       } else if (data?.packet === "key") {
-        if (this.ready && this.g) {
-          this.g.playerControl(this, data?.data.key, data?.data.state);
-        }
+        this.setKeyState(data.data.key, data.data.state);
       }
     });
   }
 
   public sendMessage(stringifiedMessage: string) {
-    // This is a single player game, just broadcast
     try {
       this.socket.send(stringifiedMessage);
     } catch (_e) {
@@ -139,6 +152,11 @@ class Player {
     this.g = g;
   }
 
+  public setKeyState(key: string, value: boolean) {
+    this.controls[key] = value;
+    if (this.g) this.g.act(this, key, value);
+  }
+
   private validateNickname(n: string): string | undefined {
     if (typeof n !== "string") {
       return "Nickname is of invalid type";
@@ -152,6 +170,13 @@ class Player {
 
   public getNickname(): string {
     return this.nickname;
+  }
+
+  /**
+   * Gets the current control state for the player.
+   */
+  getControls(): { [key: string]: boolean } {
+    return this.controls;
   }
 }
 

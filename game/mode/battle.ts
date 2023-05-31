@@ -1,4 +1,4 @@
-// game/mode/coop.ts
+// game/mode/battle.ts
 
 import { Game } from "../game.ts";
 import { Tetromino, TetrominoFactory, Vector } from "../tetromino.ts";
@@ -6,11 +6,11 @@ import { GameGrid } from "../grid.ts";
 import { Player } from "../../server/player.ts";
 
 /**
- * Represents a co-op game with two players.
+ * Represents a PvP battle game with two players.
  */
-export class CoopGame extends Game {
-  // The 20x22 grid of history, the first two lines should be hidden in visualization
-  grid: GameGrid;
+export class BattleGame extends Game {
+  // The 10x22 grid of history, the first two lines should be hidden in visualization
+  grid: GameGrid[];
 
   // Five position array per player of tetrominoes, where first index is playerIndex, and second index is upcoming tetromino index
 
@@ -24,38 +24,51 @@ export class CoopGame extends Game {
   Rotation: number[];
 
   // Internal stuff below
-  Score: number;
-  Level: number;
-  Lines: number;
+  Score: number[];
+  Level: number[];
+  Lines: number[];
 
   timerModified: Date[];
-  lastScore: number;
+  lastScore: number[];
+
+  winnerIndex = -1;
 
   /**
-   * Creates a new CoOpGame instance.
+   * Creates a new BattleGame instance.
    */
   constructor(code?: string) {
-    super("coop", code);
+    super("battle", code);
 
-    this.grid = new GameGrid(20, 22);
+    this.grid = [];
+
     this.factory = new TetrominoFactory();
+
+    this.Score = [];
+    this.Level = [];
+    this.Lines = [];
+
+    this.lastScore = [];
 
     this.Tetrominoes = [];
     this.Position = [];
     this.GhostPosition = [];
     this.Rotation = [];
 
-    this.Score = 0;
-    this.Level = 0;
-    this.Lines = 0;
-
-    // Keep track if score has changed since last call to scoreChanged()
-    this.lastScore = -1;
-
     this.timerModified = [];
-    this.grid.Clear();
 
     for (let i = 0; i < 2; i++) {
+      const newGrid = new GameGrid(10, 22);
+      newGrid.Clear();
+
+      this.grid.push(newGrid);
+
+      this.Score.push(0);
+      this.Level.push(0);
+      this.Lines.push(0);
+
+      // Keep track if score has changed since last call to scoreChanged()
+      this.lastScore.push(0);
+
       this.Tetrominoes.push([]);
       this.Position.push({ X: 0, Y: 0 });
       this.GhostPosition.push({ X: 0, Y: 0 });
@@ -78,6 +91,14 @@ export class CoopGame extends Game {
     return (this.listPlayers().length === 2);
   }
 
+  sendData() {
+    for (const player of this.listPlayers()) {
+      player.sendMessage(
+        JSON.stringify(this.getData(this.getPlayerIndex(player))),
+      );
+    }
+  }
+
   broadcast(m: unknown) {
     for (const player of this.listPlayers()) {
       player.sendMessage(JSON.stringify(m));
@@ -91,27 +112,26 @@ export class CoopGame extends Game {
     const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.Y += 1;
 
-    while (this.validMove(currentSprite, bogusPosition)) {
+    while (this.validMove(currentSprite, bogusPosition, playerIndex)) {
       this.GhostPosition[playerIndex] = structuredClone(bogusPosition);
       bogusPosition.Y += 1;
     }
 
-    this.broadcast(this.getData());
+    this.sendData();
   }
 
-  getData(): unknown {
+  getData(playerIndex: number): unknown {
     return {
-      Position1: this.Position[0],
-      Position2: this.Position[1],
+      Position: this.Position,
       Level: this.Level,
       Lines: this.Lines,
       Score: this.Score,
-      GhostPosition1: this.GhostPosition[0],
-      GhostPosition2: this.GhostPosition[1],
-      Rotation1: this.Rotation[0],
-      Rotation2: this.Rotation[1],
+      GhostPosition: this.GhostPosition,
+      Rotation: this.Rotation,
       Tetrominoes: this.Tetrominoes,
       Grid: this.grid,
+      Winner: this.winnerIndex,
+      PlayerIndex: playerIndex,
     };
   }
 
@@ -124,7 +144,7 @@ export class CoopGame extends Game {
     const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.X += d;
 
-    if (this.validMove(currentSprite, bogusPosition)) {
+    if (this.validMove(currentSprite, bogusPosition, playerIndex)) {
       this.Position[playerIndex] = structuredClone(bogusPosition);
       this.changed(playerIndex);
       return true;
@@ -168,19 +188,19 @@ export class CoopGame extends Game {
     }
   }
 
-  iterateDelayMs(): number {
+  iterateDelayMs(playerIndex: number): number {
     // Reduce 25 ms for each level, bottom out on 110ms
-    return Math.max(500 - 25 * this.Level, 100);
+    return Math.max(500 - 25 * this.Level[playerIndex], 100);
   }
 
   iterate(): boolean {
     const currentTime = new Date().getTime();
-    const iterateDelay = this.iterateDelayMs();
     for (
       let playerIndex = 0;
       playerIndex < this.listPlayers().length;
       playerIndex++
     ) {
+      const iterateDelay = this.iterateDelayMs(playerIndex);
       const timeDifference = currentTime -
         this.timerModified[playerIndex].getTime();
       if (timeDifference > iterateDelay) {
@@ -203,7 +223,7 @@ export class CoopGame extends Game {
 
     this.resetTimerIfLanded(playerIndex);
 
-    if (this.validMove(currentSprite, bogusPosition)) {
+    if (this.validMove(currentSprite, bogusPosition, playerIndex)) {
       this.Position[playerIndex] = structuredClone(bogusPosition);
       this.changed(playerIndex);
       return true;
@@ -219,7 +239,7 @@ export class CoopGame extends Game {
     const bogusPosition: Vector = { ...this.Position[playerIndex] };
     bogusPosition.Y += 1;
 
-    if (this.validMove(currentSprite, bogusPosition)) {
+    if (this.validMove(currentSprite, bogusPosition, playerIndex)) {
       return false;
     } else {
       return true;
@@ -235,21 +255,61 @@ export class CoopGame extends Game {
 
     let dropOffset = 0;
 
-    while (this.validMove(currentSprite, bogusPosition)) {
+    while (this.validMove(currentSprite, bogusPosition, playerIndex)) {
       this.Position[playerIndex] = structuredClone(bogusPosition);
       dropOffset += 1;
       bogusPosition.Y += 1;
     }
 
-    this.addScore(dropOffset * 2, true);
+    this.addScore(dropOffset * 2, true, playerIndex);
 
     this.lockdown(playerIndex);
   }
 
   scoreChanged(): boolean {
-    const newScore = this.Score !== this.lastScore;
-    this.lastScore = this.Score;
-    return newScore;
+    let changed = false;
+    for (let i = 0; i < this.listPlayers().length; i++) {
+      const newScore = this.Score[i] !== this.lastScore[i];
+      this.lastScore[i] = this.Score[i];
+      if (newScore) changed = true;
+    }
+    return changed;
+  }
+
+  addRowsToPlayer(rows: number, playerIndex: number) {
+    // Available colors for the blocks
+    const tetrominoColors = ["O", "I", "T", "S", "Z", "J", "L"];
+
+    // Add the rows to the bottom of the player's grid and remove the same number of rows from the top
+    for (let i = 0; i < rows; i++) {
+      // Generate a new row with random blocks for each iteration
+      let newRow = Array(this.grid[playerIndex].width).fill(undefined);
+      let blocksCount = 0; // Count of blocks in a row
+
+      for (let j = 0; j < newRow.length; j++) {
+        if (Math.random() < 0.5) {
+          newRow[j] =
+            tetrominoColors[Math.floor(Math.random() * tetrominoColors.length)];
+          blocksCount++;
+        }
+      }
+
+      // Ensure at least 1 and at most (width - 1) blocks are in the row
+      if (blocksCount === 0) {
+        newRow[Math.floor(Math.random() * newRow.length)] =
+          tetrominoColors[Math.floor(Math.random() * tetrominoColors.length)];
+      } else if (blocksCount === newRow.length) {
+        newRow[Math.floor(Math.random() * newRow.length)] = undefined;
+      }
+
+      this.grid[playerIndex].Data = [
+        ...this.grid[playerIndex].Data.slice(
+          this.grid[playerIndex].width,
+          this.grid[playerIndex].Data.length,
+        ),
+        ...newRow,
+      ];
+    }
   }
 
   lockdown(playerIndex: number): boolean {
@@ -259,6 +319,7 @@ export class CoopGame extends Game {
         this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]]
           .Data,
         this.Position[playerIndex],
+        playerIndex,
       )
     ) {
       // Kick up
@@ -269,34 +330,41 @@ export class CoopGame extends Game {
       }
     }
 
-    const clearedRows = this.grid.ApplySprite(
+    const clearedRows = this.grid[playerIndex].ApplySprite(
       this.Tetrominoes[playerIndex][0].Sprites[this.Rotation[playerIndex]].Data,
       this.Position[playerIndex],
       this.Tetrominoes[playerIndex][0].Type,
     );
 
+    const opponentIndex = (playerIndex + 1) % 2; // Get the other player's index
+
     // End condition ?
     if (clearedRows == -1) {
+      this.winnerIndex = opponentIndex;
+      // Send an extra update
+      this.sendData();
       return false;
     }
 
     // Count cleared lines
-    this.Lines += clearedRows;
+    this.Lines[playerIndex] += clearedRows;
 
-    // Add score for cleared rows
+    // Add score for cleared rows and add rows to opponent
     if (clearedRows == 1) {
-      this.addScore(40, true);
+      this.addScore(40, true, playerIndex);
     } else if (clearedRows == 2) {
-      this.addScore(40 * 2 * 2, true); // x2
+      this.addScore(40 * 2 * 2, true, playerIndex); // x2
     } else if (clearedRows == 3) {
-      this.addScore(40 * 3 * 4, true); // x4
+      this.addScore(40 * 3 * 4, true, playerIndex); // x4
+      this.addRowsToPlayer(1, opponentIndex); // Add 1 row to opponent
     } else if (clearedRows == 4) {
-      this.addScore(40 * 4 * 8, true); // x8
+      this.addScore(40 * 4 * 8, true, playerIndex); // x8
+      this.addRowsToPlayer(2, opponentIndex); // Add 2 rows to opponent
     }
 
     // Time to level up?
-    if (this.Lines > (this.Level + 1) * 5) {
-      this.Level += 1;
+    if (this.Lines[playerIndex] > (this.Level[playerIndex] + 1) * 5) {
+      this.Level[playerIndex] += 1;
     }
 
     // Spawn new tetromino!
@@ -312,7 +380,7 @@ export class CoopGame extends Game {
   }
 
   nextTetromino(playerIndex: number): void {
-    this.Position[playerIndex] = { X: playerIndex * 10 + 3, Y: 0 };
+    this.Position[playerIndex] = { X: 3, Y: 0 };
     this.Rotation[playerIndex] = 0;
     this.Tetrominoes[playerIndex][0] = this.Tetrominoes[playerIndex][1];
     this.Tetrominoes[playerIndex][1] = this.Tetrominoes[playerIndex][2];
@@ -334,7 +402,9 @@ export class CoopGame extends Game {
     const currentSprite =
       this.Tetrominoes[playerIndex][0].Sprites[bogusRotation].Data;
 
-    if (this.validMove(currentSprite, this.Position[playerIndex])) {
+    if (
+      this.validMove(currentSprite, this.Position[playerIndex], playerIndex)
+    ) {
       this.Rotation[playerIndex] = bogusRotation;
       this.changed(playerIndex);
       return;
@@ -343,7 +413,7 @@ export class CoopGame extends Game {
     for (const kick of [-1, 1, -2, 2]) {
       const bogusPosition: Vector = { ...this.Position[playerIndex] };
       bogusPosition.X += kick;
-      if (this.validMove(currentSprite, bogusPosition)) {
+      if (this.validMove(currentSprite, bogusPosition, playerIndex)) {
         this.Rotation[playerIndex] = structuredClone(bogusRotation);
         this.Position[playerIndex] = structuredClone(bogusPosition);
         this.changed(playerIndex);
@@ -352,15 +422,18 @@ export class CoopGame extends Game {
     }
   }
 
-  validMove(s: Vector[], p: Vector): boolean {
+  validMove(s: Vector[], p: Vector, playerIndex: number): boolean {
     for (const v of s) {
       // Check that there is space below
       const targetX = v.X + p.X;
       const targetY = v.Y + p.Y; // Increment Y position by 1
-      const outOfRange = targetX < 0 || targetX > this.grid.width - 1 ||
+      const outOfRange = targetX < 0 ||
+        targetX > this.grid[playerIndex].width - 1 ||
         targetY < 0 ||
-        targetY > this.grid.height - 1 ||
-        (this.grid.Data[targetX + targetY * this.grid.width] !== undefined);
+        targetY > this.grid[playerIndex].height - 1 ||
+        (this.grid[playerIndex]
+          .Data[targetX + targetY * this.grid[playerIndex].width] !==
+          undefined);
       if (outOfRange) { // Check for undefined instead of null
         return false;
       }
@@ -399,13 +472,13 @@ export class CoopGame extends Game {
     }
   }
 
-  addScore(baseScore: number, levelBoost: boolean) {
+  addScore(baseScore: number, levelBoost: boolean, playerIndex: number) {
     let newScore = 0;
     if (levelBoost) {
-      newScore += baseScore * (this.Level + 1);
+      newScore += baseScore * (this.Level[playerIndex] + 1);
     } else {
       newScore += baseScore;
     }
-    this.Score += newScore;
+    this.Score[playerIndex] += newScore;
   }
 }

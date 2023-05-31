@@ -37,19 +37,36 @@ const MainLoop = () => {
       if (game.scoreChanged()) {
         // Determine nickname
         let nickname = "";
+        let score = 0;
+        let level = 0;
+        let lines = 0;
         if (game.listPlayers().length == 2) {
-          nickname = game.listPlayers()[0].getNickname() + " & " +
-            game.listPlayers()[1].getNickname();
+          if (game.getMode() === "battle") {
+            const winner = (game.getData() as { Winner: number }).Winner;
+            if (winner >= 0) {
+              nickname = game.listPlayers()[winner].getNickname();
+              score = (game.getData() as { Score: number[] }).Score[winner];
+            }
+          } else if (game.getMode() === "coop") {
+            nickname = game.listPlayers()[0].getNickname() + " & " +
+              game.listPlayers()[1].getNickname();
+            score = (game.getData() as { Score: number }).Score;
+            level = (game.getData() as { Levels: number }).Levels;
+            lines = (game.getData() as { Lines: number }).Lines;
+          }
         } else {
           nickname = game.listPlayers()[0].getNickname();
+          score = (game.getData() as { Score: number }).Score;
+          level = (game.getData() as { Levels: number }).Levels;
+          lines = (game.getData() as { Lines: number }).Lines;
         }
 
         // Write highscore
         highscore.write(game.getMode(), {
-          nickname: nickname,
-          score: (game.getData() as { Score: number }).Score,
-          level: (game.getData() as { Level: number }).Level,
-          lines: (game.getData() as { Lines: number }).Lines,
+          nickname,
+          score,
+          level,
+          lines,
           ts: new Date(),
           tsInit: game.getCreateTime(),
         });
