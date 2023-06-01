@@ -52,9 +52,11 @@ class Network {
     }
   }
 
-  sendPlayerReady(nickname, mode, code) {
+  sendPlayerReady(nickname, mode, code, ai = false) {
     if (this.ws.readyState == this.ws.OPEN) {
-      this.ws.send(JSON.stringify({ packet: "ready", nickname, mode, code }));
+      this.ws.send(
+        JSON.stringify({ packet: "ready", nickname, mode, code, ai }),
+      );
     }
   }
 

@@ -120,7 +120,7 @@ export class BattleGame extends Game {
     this.sendData();
   }
 
-  getData(playerIndex: number): unknown {
+  getData(playerIndex?: number): unknown {
     return {
       Position: this.Position,
       Level: this.Level,
@@ -133,6 +133,10 @@ export class BattleGame extends Game {
       Winner: this.winnerIndex,
       PlayerIndex: playerIndex,
     };
+  }
+
+  getDataNew(playerIndex?: number | undefined): unknown {
+    return this.getData(playerIndex);
   }
 
   moveX(d: number, playerIndex: number): boolean {
@@ -283,7 +287,7 @@ export class BattleGame extends Game {
     // Add the rows to the bottom of the player's grid and remove the same number of rows from the top
     for (let i = 0; i < rows; i++) {
       // Generate a new row with random blocks for each iteration
-      let newRow = Array(this.grid[playerIndex].width).fill(undefined);
+      const newRow = Array(this.grid[playerIndex].width).fill(undefined);
       let blocksCount = 0; // Count of blocks in a row
 
       for (let j = 0; j < newRow.length; j++) {

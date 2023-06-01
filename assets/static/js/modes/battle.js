@@ -34,7 +34,7 @@ const gotData = (game) => {
   return done;
 };
 
-const StartBattle = (nickname, code, network) => {
+const StartBattle = (nickname, code, network, ai) => {
   let game = new Game();
 
   // Run setup in "background"
@@ -43,7 +43,12 @@ const StartBattle = (nickname, code, network) => {
     viewport = new Viewport("#battlegame", "gf", 640, 480);
     game.setViewport(viewport);
 
-    network.sendPlayerReady(nickname, "battle", code);
+    network.sendPlayerReady(
+      nickname,
+      "battle",
+      code,
+      ai ? (globalThis.DetrisAIConf || true) : false,
+    );
 
     try {
       // Wait for data
@@ -53,13 +58,10 @@ const StartBattle = (nickname, code, network) => {
       showScreen("battlegame");
 
       // Play game
-      console.log("Pregame");
       await game.play();
 
-      console.log("Postgame");
       // Get score
       // ToDo: Currently always showing player 0s score
-      console.log(game.getData());
       if (game.getData().Winner >= 0) {
         showScreen(
           "battlehighscore",

@@ -19,7 +19,6 @@ let currentGame = undefined;
 const network = new Network();
 const onNetworkMessage = (o) => {
   if (currentGame) {
-    console.log(o);
     if (o.Grid) {
       currentGame.setData(o);
     } else if (o.gameOver) {
@@ -47,13 +46,13 @@ onScreenEvent("modeselect", "singleplayer", (nickname) => {
   showScreen("loading");
   currentGame = StartSingleplayer(nickname, network);
 });
-onScreenEvent("modeselect", "coop", (nickname, code) => {
+onScreenEvent("modeselect", "coop", (nickname, code, ai) => {
   showScreen("starting");
-  currentGame = StartCoop(nickname, code, network);
+  currentGame = StartCoop(nickname, code, network, ai);
 });
-onScreenEvent("modeselect", "battle", (nickname, code) => {
+onScreenEvent("modeselect", "battle", (nickname, code, ai) => {
   showScreen("starting");
-  currentGame = StartBattle(nickname, code, network);
+  currentGame = StartBattle(nickname, code, network, ai);
 });
 
 // Singleplayer initialization

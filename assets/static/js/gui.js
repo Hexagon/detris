@@ -31,6 +31,7 @@ const elements = {
   inputs: {
     nickname: document.getElementById("txtNickname"),
     checkprivate: document.getElementById("chkPrivate"),
+    checkai: document.getElementById("chkAI"),
     code: document.getElementById("txtCode"),
   },
   buttons: {
@@ -100,6 +101,7 @@ const initializers = {
         events.modeselect.coop(
           elements.inputs.nickname.value,
           elements.inputs.code.value,
+          !!elements.inputs.checkai.checked,
         );
       }
     });
@@ -109,6 +111,7 @@ const initializers = {
         events.modeselect.battle(
           elements.inputs.nickname.value,
           elements.inputs.code.value,
+          !!elements.inputs.checkai.checked,
         );
       }
     });

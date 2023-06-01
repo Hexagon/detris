@@ -1,6 +1,6 @@
 // game/game.ts
 
-import type { Player } from "../server/player.ts";
+import type { BasePlayer } from "../server/baseplayer.ts";
 
 export type GameStatus = "created" | "playing" | "gameover" | "abandoned";
 
@@ -19,7 +19,7 @@ export class Game {
   private initializationTime: number;
   private cleanupTimer?: number;
 
-  private players: Player[] = [];
+  private players: BasePlayer[] = [];
 
   /**
    * Creates a new Game instance.
@@ -56,8 +56,12 @@ export class Game {
     throw new Error("scoreChanged not implemented");
   }
 
-  getData(playerIndex?: number): unknown {
+  getData(_playerIndex?: number): unknown {
     throw new Error("getData not implemented");
+  }
+
+  getDataNew(_playerIndex?: number): unknown {
+    throw new Error("getDataNew not implemented");
   }
 
   getStatus(): GameStatus {
@@ -88,7 +92,7 @@ export class Game {
    * Adds a player to the game.
    * @param player The player to add.
    */
-  addPlayer(player: Player): void {
+  addPlayer(player: BasePlayer): void {
     this.players.push(player);
     player.setGame(this);
   }
@@ -114,7 +118,7 @@ export class Game {
    * Lists players in a game.
    * @resturns Array of players
    */
-  listPlayers(): Player[] {
+  listPlayers(): BasePlayer[] {
     return this.players;
   }
 
@@ -129,7 +133,7 @@ export class Game {
   /**
    * Act when player control changes
    */
-  act(_player: Player, _key: string, _value: boolean): void {
+  act(_player: BasePlayer, _key: string, _value: boolean): void {
     throw new Error("act() not implemented in game mode");
   }
 

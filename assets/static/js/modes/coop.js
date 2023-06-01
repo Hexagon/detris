@@ -34,7 +34,7 @@ const gotData = (game) => {
   return done;
 };
 
-const StartCoop = (nickname, code, network) => {
+const StartCoop = (nickname, code, network, ai) => {
   let game = new Game();
 
   // Run setup in "background"
@@ -43,7 +43,12 @@ const StartCoop = (nickname, code, network) => {
     viewport = new Viewport("#coopgame", "gf", 640, 480);
     game.setViewport(viewport);
 
-    network.sendPlayerReady(nickname, "coop", code);
+    network.sendPlayerReady(
+      nickname,
+      "coop",
+      code,
+      ai ? (globalThis.DetrisAIConf || true) : false,
+    );
 
     try {
       // Wait for data

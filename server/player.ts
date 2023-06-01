@@ -5,6 +5,8 @@ import { Game } from "../game/game.ts";
 import { SinglePlayerGame } from "../game/mode/singleplayer.ts";
 import { CoopGame } from "../game/mode/coop.ts";
 import { BattleGame } from "../game/mode/battle.ts";
+import { AIPlayer } from "./aiplayer.ts";
+import { BasePlayer } from "./baseplayer.ts";
 
 const FindGame = async (
   games: Game[],
@@ -46,22 +48,17 @@ const FindGame = async (
   return await FindGame(games, gameType, maxPlayers, code, firstCheck);
 };
 
-class Player {
-  private socket: WebSocket;
-  private g: Game | null;
-  private nickname = "Undef";
-  private controls: { [key: string]: boolean } = {};
+class Player extends BasePlayer {
+  private socket: WebSocket | null;
+  public controls: { [key: string]: boolean } = {};
 
-  // Player is not ready yet!
-  private ready = false;
-
-  constructor(socket: WebSocket, games: Game[]) {
-    this.g = null;
+  constructor(socket: WebSocket | null, games: Game[]) {
+    super(socket, games);
 
     this.socket = socket;
 
     // Handle incoming messages
-    this.socket.addEventListener("message", async (event) => {
+    this.socket?.addEventListener("message", async (event) => {
       let data = null;
 
       try {
@@ -75,7 +72,7 @@ class Player {
         const nickname = data.nickname;
         const validationError = this.validateNickname(nickname);
         if (validationError) {
-          this.socket.send(
+          this.socket?.send(
             JSON.stringify({ ready: false, error: validationError }),
           );
         } else {
@@ -92,23 +89,35 @@ class Player {
             // Join Co-Op game
           } else if (data.mode === "coop") {
             // Find game
-            const foundGame = await FindGame(games, "coop", 1, data.code);
-            if (foundGame) {
-              this.g = foundGame;
+            if (!data.ai) {
+              const foundGame = await FindGame(games, "coop", 1, data.code);
+              if (foundGame) {
+                this.g = foundGame;
+              } else {
+                // Create game
+                this.g = new CoopGame(data.code);
+                games.push(this.g);
+              }
             } else {
               // Create game
-              this.g = new CoopGame(data.code);
+              this.g = new CoopGame("ai-game");
               games.push(this.g);
             }
-            // Join Co-Op game
+            // Join Battle game
           } else if (data.mode === "battle") {
             // Find game
-            const foundGame = await FindGame(games, "battle", 1, data.code);
-            if (foundGame) {
-              this.g = foundGame;
+            if (!data.ai) {
+              const foundGame = await FindGame(games, "battle", 1, data.code);
+              if (foundGame) {
+                this.g = foundGame;
+              } else {
+                // Create game
+                this.g = new BattleGame(data.code);
+                games.push(this.g);
+              }
             } else {
               // Create game
-              this.g = new BattleGame(data.code);
+              this.g = new BattleGame("ai-game");
               games.push(this.g);
             }
           } else {
@@ -122,11 +131,14 @@ class Player {
           // Attach player to game
           this.g.addPlayer(this);
 
-          // Mark player ready
-          this.ready = true;
+          if (data.ai) {
+            // Attach ai player
+            const ai = new AIPlayer(games, data.ai);
+            ai.connect(this.g);
+          }
 
           // Notify server that everything is ready
-          this.socket.send(JSON.stringify({ ready: true }));
+          this.socket?.send(JSON.stringify({ ready: true }));
         }
 
         // React to key presses
@@ -138,45 +150,10 @@ class Player {
 
   public sendMessage(stringifiedMessage: string) {
     try {
-      this.socket.send(stringifiedMessage);
+      this.socket?.send(stringifiedMessage);
     } catch (_e) {
       /* Ignore */
     }
-  }
-
-  public setNickname(nickname: string) {
-    this.nickname = nickname;
-  }
-
-  public setGame(g: Game | null) {
-    this.g = g;
-  }
-
-  public setKeyState(key: string, value: boolean) {
-    this.controls[key] = value;
-    if (this.g) this.g.act(this, key, value);
-  }
-
-  private validateNickname(n: string): string | undefined {
-    if (typeof n !== "string") {
-      return "Nickname is of invalid type";
-    }
-    if (n.length < 2) {
-      return "Nickname too short, need to be at least 2 characters";
-    } else if (n.length > 15) {
-      return "Nickname too long, need to be at most 15 characters";
-    }
-  }
-
-  public getNickname(): string {
-    return this.nickname;
-  }
-
-  /**
-   * Gets the current control state for the player.
-   */
-  getControls(): { [key: string]: boolean } {
-    return this.controls;
   }
 }
 

@@ -115,6 +115,19 @@ export class CoopGame extends Game {
     };
   }
 
+  getDataNew(): unknown {
+    return {
+      Position: this.Position,
+      Level: this.Level,
+      Lines: this.Lines,
+      Score: this.Score,
+      GhostPosition: this.GhostPosition,
+      Rotation: this.Rotation,
+      Tetrominoes: this.Tetrominoes,
+      Grid: this.grid,
+    };
+  }
+
   moveX(d: number, playerIndex: number): boolean {
     this.resetTimerIfLanded(playerIndex); // Assuming resetTimerIfLanded() method is implemented in Game class
 
