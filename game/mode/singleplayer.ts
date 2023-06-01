@@ -35,7 +35,7 @@ export class SinglePlayerGame extends Game {
   Level: number;
   Lines: number;
 
-  timerReal: Date;
+  timerResets: number;
   timerModified: Date;
   lastScore: number;
 
@@ -60,7 +60,7 @@ export class SinglePlayerGame extends Game {
     // Keep track if score has changed since last call to scoreChanged()
     this.lastScore = -1;
 
-    this.timerReal = new Date();
+    this.timerResets = 0;
     this.timerModified = new Date();
 
     this.grid.Clear();
@@ -166,9 +166,8 @@ export class SinglePlayerGame extends Game {
     const iterateDelay = this.iterateDelayMs();
     if (timeDifference > iterateDelay) {
       // Reset timer
-      this.timerReal = new Date();
       this.timerModified = new Date();
-
+      this.timerResets = 0;
       if (!this.moveDown()) {
         return this.lockdown();
       }
@@ -301,9 +300,10 @@ export class SinglePlayerGame extends Game {
 
   resetTimerIfLanded(): void {
     if (this.hasLanded()) {
-      if (Date.now() - this.timerReal.getTime() < this.iterateDelayMs()) {
+      if (this.timerResets < 15) {
         this.timerModified = new Date();
       }
+      this.timerResets++;
     }
   }
 

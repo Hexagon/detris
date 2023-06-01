@@ -29,6 +29,8 @@ export class CoopGame extends Game {
   Lines: number;
 
   timerModified: Date[];
+  timerResets: number[];
+
   lastScore: number;
 
   /**
@@ -53,6 +55,8 @@ export class CoopGame extends Game {
     this.lastScore = -1;
 
     this.timerModified = [];
+    this.timerResets = [];
+
     this.grid.Clear();
 
     for (let i = 0; i < 2; i++) {
@@ -62,6 +66,7 @@ export class CoopGame extends Game {
       this.Rotation.push(0);
 
       this.timerModified[i] = new Date();
+      this.timerResets[i] = 0;
 
       this.Tetrominoes[i][1] = this.factory.Next();
       this.Tetrominoes[i][2] = this.factory.Next();
@@ -198,6 +203,7 @@ export class CoopGame extends Game {
         this.timerModified[playerIndex].getTime();
       if (timeDifference > iterateDelay) {
         this.timerModified[playerIndex] = new Date();
+        this.timerResets[playerIndex] = 0;
         if (!this.moveDown(playerIndex)) {
           const lockDownResult = this.lockdown(playerIndex);
           if (!lockDownResult) return lockDownResult;
@@ -408,7 +414,10 @@ export class CoopGame extends Game {
 
   resetTimerIfLanded(playerIndex: number): void {
     if (this.hasLanded(playerIndex)) {
-      this.timerModified[playerIndex] = new Date();
+      if (this.timerResets[playerIndex] < 15) {
+        this.timerModified[playerIndex] = new Date();
+      }
+      this.timerResets[playerIndex]++;
     }
   }
 

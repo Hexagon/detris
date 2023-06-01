@@ -29,6 +29,7 @@ export class BattleGame extends Game {
   Lines: number[];
 
   timerModified: Date[];
+  timerResets: number[];
   lastScore: number[];
 
   winnerIndex = -1;
@@ -55,6 +56,7 @@ export class BattleGame extends Game {
     this.Rotation = [];
 
     this.timerModified = [];
+    this.timerResets = [];
 
     for (let i = 0; i < 2; i++) {
       const newGrid = new GameGrid(10, 22);
@@ -75,6 +77,8 @@ export class BattleGame extends Game {
       this.Rotation.push(0);
 
       this.timerModified[i] = new Date();
+
+      this.timerResets[i] = 0;
 
       this.Tetrominoes[i][1] = this.factory.Next();
       this.Tetrominoes[i][2] = this.factory.Next();
@@ -209,6 +213,7 @@ export class BattleGame extends Game {
         this.timerModified[playerIndex].getTime();
       if (timeDifference > iterateDelay) {
         this.timerModified[playerIndex] = new Date();
+        this.timerResets[playerIndex] = 0;
         if (!this.moveDown(playerIndex)) {
           const lockDownResult = this.lockdown(playerIndex);
           if (!lockDownResult) return lockDownResult;
@@ -472,7 +477,10 @@ export class BattleGame extends Game {
 
   resetTimerIfLanded(playerIndex: number): void {
     if (this.hasLanded(playerIndex)) {
-      this.timerModified[playerIndex] = new Date();
+      if (this.timerResets[playerIndex] < 15) {
+        this.timerModified[playerIndex] = new Date();
+      }
+      this.timerResets[playerIndex]++;
     }
   }
 
