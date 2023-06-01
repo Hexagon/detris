@@ -4,29 +4,34 @@ import { GameGrid } from "../game/grid.ts";
 import { Vector } from "../game/tetromino.ts";
 import { BasePlayer } from "./baseplayer.ts";
 
-let BOT_NICKNAME = "AI-BOT";
-let BASE_DECISION_DELAY_MS = 200;
-let RANDOM_DECISION_DELAY_MAX_MS = 500;
-//let ERROR_PROBABILITY_PERCENT = 2;
-
 class AIPlayer extends BasePlayer {
   private aiInterval: number | undefined;
+
+  private BOT_NICKNAME = "AI-BOT";
+  private BASE_DECISION_DELAY_MS = 200;
+  private RANDOM_DECISION_DELAY_MAX_MS = 500;
 
   // deno-lint-ignore no-explicit-any
   constructor(games: Game[], config: any) {
     super(null, games); // null socket
-    this.setNickname(BOT_NICKNAME);
+    this.setNickname(this.BOT_NICKNAME);
 
+    // Custom config
     if (config) {
-      if (config.BOT_NICKNAME) BOT_NICKNAME = config.BOT_NICKNAME;
+      if (config.BOT_NICKNAME) this.BOT_NICKNAME = config.BOT_NICKNAME;
       if (config.BASE_DECISION_DELAY_MS) {
-        BASE_DECISION_DELAY_MS = config.BASE_DECISION_DELAY_MS;
+        this.BASE_DECISION_DELAY_MS = config.BASE_DECISION_DELAY_MS;
       }
       if (config.RANDOM_DECISION_DELAY_MAX_MS) {
-        RANDOM_DECISION_DELAY_MAX_MS = config.RANDOM_DECISION_DELAY_MAX_MS;
+        this.RANDOM_DECISION_DELAY_MAX_MS = config.RANDOM_DECISION_DELAY_MAX_MS;
       }
     }
-    //if (config.ERROR_PROBABILITY_PERCENT) ERROR_PROBABILITY_PERCENT = config.ERROR_PROBABILITY_PERCENT;
+
+    // Cap custom config
+    if (this.BASE_DECISION_DELAY_MS < 50) this.BASE_DECISION_DELAY_MS = 50;
+    if (this.RANDOM_DECISION_DELAY_MAX_MS < 50) {
+      this.RANDOM_DECISION_DELAY_MAX_MS = 50;
+    }
   }
 
   public connect(game: Game) {
@@ -44,16 +49,20 @@ class AIPlayer extends BasePlayer {
   }
 
   private startAI() {
-    this.aiInterval = setInterval(() => {
-      const controls = this.calculateAIControls();
-      for (const key in controls) {
-        this.setKeyState(key, controls[key]);
-      }
+    this.aiInterval = setInterval(
+      () => {
+        const controls = this.calculateAIControls();
+        for (const key in controls) {
+          this.setKeyState(key, controls[key]);
+        }
 
-      if (this.g?.getStatus() === "gameover") {
-        clearInterval(this.aiInterval);
-      }
-    }, BASE_DECISION_DELAY_MS + (Math.random() * RANDOM_DECISION_DELAY_MAX_MS)); // AI decision every xms
+        if (this.g?.getStatus() === "gameover") {
+          clearInterval(this.aiInterval);
+        }
+      },
+      this.BASE_DECISION_DELAY_MS +
+        (Math.random() * this.RANDOM_DECISION_DELAY_MAX_MS),
+    ); // AI decision every xms
   }
 
   private calculateAIControls(): { [key: string]: boolean } {
