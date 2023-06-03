@@ -61,7 +61,6 @@ const StartBattle = (nickname, code, network, ai) => {
       await game.play();
 
       // Get score
-      // ToDo: Currently always showing player 0s score
       if (game.getData().Winner >= 0) {
         showScreen(
           "battlehighscore",

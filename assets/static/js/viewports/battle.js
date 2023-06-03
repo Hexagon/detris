@@ -51,7 +51,7 @@ class Viewport {
   #drawHider() {
     const { context } = this;
     // Create gradient
-    const grd = context.createLinearGradient(95, 15, 225, 30);
+    const grd = context.createLinearGradient(105, 15, 225, 30);
     grd.addColorStop(0, "rgb(8,8,8)");
     grd.addColorStop(0.8, "rgba(32,32,32,0)");
 
@@ -59,12 +59,12 @@ class Viewport {
     context.fillRect(175, 15, 210, 30);
 
     // Create player 2 gradient
-    const grd2 = context.createLinearGradient(95 + 230, 15, 225, 30);
+    /*const grd2 = context.createLinearGradient(105 + 230, 15, 225, 30);
     grd2.addColorStop(0, "rgb(8,8,8)");
     grd2.addColorStop(0.8, "rgba(32,32,32,0)");
 
     context.fillStyle = grd2;
-    context.fillRect(175 + 230, 15, 210, 30);
+    context.fillRect(175 + 230, 15, 210, 30);*/
   }
 
   #fillWithGradient(color, px, py) {
@@ -176,19 +176,22 @@ class Viewport {
     context.fillStyle = "rgb(196,196,196)";
 
     context.fillText("QUEUE", 0, 80);
-    context.fillText("QUEUE", 550, 80);
+    context.fillText("QUEUE", 570, 80);
     context.fillText("SCORE", 0, 310);
-    context.fillText("LEVEL", 0, 340);
-    context.fillText("LINES", 0, 380);
+    context.fillText("LEVEL", 0, 380);
+    context.fillText("SCORE", 570, 310);
+    context.fillText("LEVEL", 570, 380);
 
     context.font = "200 24px Raleway";
 
     context.fillText(game.data?.Score[0] || "0", 0, 340);
-    context.fillText(game.data?.Level[0] || "0", 0, 370);
-    context.fillText(game.data?.Lines[0] || "0", 0, 410);
+    context.fillText(game.data?.Level[0] || "0", 0, 410);
+
+    context.fillText(game.data?.Score[1] || "0", 570, 340);
+    context.fillText(game.data?.Level[1] || "0", 570, 410);
 
     context.fillText("Player 1", 0, 30);
-    context.fillText("Player 2", 550, 30);
+    context.fillText("Player 2", 570, 30);
   }
 
   redraw(gameData) {

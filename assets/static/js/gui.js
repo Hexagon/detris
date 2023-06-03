@@ -359,50 +359,52 @@ const updaters = {
     `;
     }
 
-    // Fetch highscore
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "api/highscores/battle");
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        const res = JSON.parse(xhr.responseText);
-        let html = "";
-        let current = 0;
-        const max = 10;
-        if (res.ath) {
-          res.ath.forEach(function (hs) {
-            if (current++ < max) {
-              html +=
-                '<div class="highscore-entry"><h5 class="right no-margin">' +
-                htmlEscape(hs.score) +
-                '</h5><h5 class="no-margin">' +
-                htmlEscape(hs.nickname) +
-                "</h5></div>";
-            }
-          });
+    setTimeout(() => {
+      // Fetch highscore
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "api/highscores/battle");
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          let html = "";
+          let current = 0;
+          const max = 10;
+          if (res.ath) {
+            res.ath.forEach(function (hs) {
+              if (current++ < max) {
+                html +=
+                  '<div class="highscore-entry"><h5 class="right no-margin">' +
+                  htmlEscape(hs.score) +
+                  '</h5><h5 class="no-margin">' +
+                  htmlEscape(hs.nickname) +
+                  "</h5></div>";
+              }
+            });
+          }
+
+          elements.containers.hsBattleAllTime.innerHTML = html;
+
+          html = "";
+          current = 0;
+
+          if (res.week) {
+            res.week.forEach(function (hs) {
+              if (current++ < max) {
+                html +=
+                  '<div class="highscore-entry"><h5 class="right no-margin">' +
+                  htmlEscape(hs.score) +
+                  '</h5><h5 class="no-margin">' +
+                  htmlEscape(hs.nickname) +
+                  "</h5></div>";
+              }
+            });
+          }
+
+          elements.containers.hsBattleLast7Days.innerHTML = html;
         }
-
-        elements.containers.hsBattleAllTime.innerHTML = html;
-
-        html = "";
-        current = 0;
-
-        if (res.week) {
-          res.week.forEach(function (hs) {
-            if (current++ < max) {
-              html +=
-                '<div class="highscore-entry"><h5 class="right no-margin">' +
-                htmlEscape(hs.score) +
-                '</h5><h5 class="no-margin">' +
-                htmlEscape(hs.nickname) +
-                "</h5></div>";
-            }
-          });
-        }
-
-        elements.containers.hsBattleLast7Days.innerHTML = html;
-      }
-    };
-    xhr.send();
+      };
+      xhr.send();
+    }, 1500);
   },
 };
 

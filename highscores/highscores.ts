@@ -39,8 +39,8 @@ export async function write(mode: string, h: Highscore): Promise<boolean> {
 }
 
 export async function read(mode: string): Promise<HighscoreMessage | null> {
-  const ath: Highscore[] = [];
-  const week: Highscore[] = [];
+  let ath: Highscore[] = [];
+  let week: Highscore[] = [];
 
   // 1 week before now
   const weekBefore = new Date();
@@ -53,7 +53,8 @@ export async function read(mode: string): Promise<HighscoreMessage | null> {
     }
     ath.push(hs);
   }
-
+  ath = ath.filter((b) => b.score > 0);
+  week = ath.filter((b) => b.score > 0);
   ath.sort((a, b) => b.score - a.score);
   week.sort((a, b) => b.score - a.score);
 
@@ -63,7 +64,7 @@ export async function read(mode: string): Promise<HighscoreMessage | null> {
 export async function readPlaying(
   mode: string,
 ): Promise<HighscoreMessageNow | null> {
-  const playing: Highscore[] = [];
+  let playing: Highscore[] = [];
 
   // 1 week before now
   const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000,
@@ -80,7 +81,7 @@ export async function readPlaying(
       playing.push(hs);
     }
   }
-
+  playing = playing.filter((b) => b.score > 0);
   playing.sort((a, b) => b.score - a.score);
 
   return { playing: playing.slice(0, 9), now: Date.now() };
@@ -89,7 +90,7 @@ export async function readPlaying(
 export async function readToday(
   mode: string,
 ): Promise<HighscoreMessageToday | null> {
-  const today: Highscore[] = [];
+  let today: Highscore[] = [];
 
   // 1 week before now
   const oneDayBefore = Date.now() - 24 * 60 * 60 * 1_000;
@@ -104,6 +105,7 @@ export async function readToday(
     today.push(hs);
   }
 
+  today = today.filter((b) => b.score > 0);
   today.sort((a, b) => b.score - a.score);
 
   return { today: today.slice(0, 9), now: Date.now() };
