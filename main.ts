@@ -116,14 +116,17 @@ serve((req: Request) => {
   // Serve static files, or 404
   if (pathname === "/") pathname = "/index.html";
   return serveFile(req, resolve(join("./assets/", pathname)));
-}, { 
+}, {
   // Port number resolution
   //
   // 1. Environment variable PUP_CLUSTER_PORT
   // 2. Environment variable DETRIS_PORT
   // 3. Static port 8080
   //
-  port: parseInt(Deno.env.get("PUP_CLUSTER_PORT") || Deno.env.get("DETRIS_PORT") || "8080", 10) 
+  port: parseInt(
+    Deno.env.get("PUP_CLUSTER_PORT") || Deno.env.get("DETRIS_PORT") || "8080",
+    10,
+  ),
 });
 
 MainLoop();
