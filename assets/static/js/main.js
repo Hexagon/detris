@@ -18,15 +18,13 @@ xhr.open("GET", "api/meta");
 xhr.onload = function () {
   if (xhr.status === 200) {
     const res = JSON.parse(xhr.responseText);
-    console.log(res)
+    console.log(res);
     if (res.version) {
-      const 
-        elmVersion = document.getElementById("version");
+      const elmVersion = document.getElementById("version");
       if (elmVersion) elmVersion.innerHTML = res.version;
     }
     if (res.instance) {
-      const 
-        elmInstance = document.getElementById("instance");
+      const elmInstance = document.getElementById("instance");
       if (elmInstance) elmInstance.innerHTML = res.instance;
     }
   }

@@ -9,9 +9,9 @@
 // - DO NOT add any wierd references here
 
 const Application = {
-    name: "detris",
-    version: "1.0.0-alpha.0",
-    repository: "https://github.com/hexagon/detris",
-}
+  name: "detris",
+  version: "1.0.0-alpha.0",
+  repository: "https://github.com/hexagon/detris",
+};
 
-export { Application }
+export { Application };
