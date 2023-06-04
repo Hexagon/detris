@@ -1,8 +1,27 @@
 // server/router.ts
 
+import { Application } from "../application.meta.ts";
 import { read, readPlaying, readToday } from "../highscores/highscores.ts";
 
 const routes = [
+  {
+    pattern: new URLPattern({ pathname: "/api/meta" }),
+    handler: function (
+      _req: Request,
+      _match: Record<string, string>
+    ): Response | undefined {
+      const meta = { 
+        ...Application,
+        instance: Deno.env.get("PUP_INSTANCE") || "0"
+      }
+      return new Response(JSON.stringify(meta), {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+        },
+      });
+    },
+  },
   {
     pattern: new URLPattern({ pathname: "/api/highscores/:mode" }),
     handler: async function (
