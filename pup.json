@@ -1,0 +1,17 @@
+{
+  "$schema": "https://deno.land/x/pup/docs/pup.schema.json",
+  "processes": [
+    {
+      "id": "detris",
+      "cmd": "deno run --allow-read --allow-write --allow-net --allow-env --unstable main.ts",
+      "restart": "always",
+      "terminate": "0 45 3 * * 0",
+      "cluster": {
+        "instances": 3,
+        "commonPort": 8080,
+        "startPort": 8081,
+        "strategy": "round-robin"
+      }
+    }
+  ]
+}

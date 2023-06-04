@@ -1,17 +1,13 @@
-# Use denoland's Deno Docker image
-FROM denoland/deno:1.33.4
+# Adjust this line to the deno version of your choice
+FROM denoland/deno:debian-1.34.1
 
-# The port that your application listens to.
-EXPOSE 8080
+# This copies all files in the current working directory to /app in the
+# docker image. 
+RUN mkdir /app
+COPY . /app/
 
-# Set the working directory in the Docker image
-WORKDIR /app
+# Install pup - Pin this url to a specific version in production
+RUN ["deno","install","-Afr","pup", "https://deno.land/x/pup/pup.ts"]
 
-# Add the rest of the source code files
-ADD . .
-
-# Compile the main application so that it doesn't need to be compiled each startup/entry
-RUN deno cache main.ts
-
-# Run your application
-CMD ["run", "--allow-read", "--allow-write", "--allow-net", "--allow-env", "--unstable", "main.ts"]
+# Go!
+ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
