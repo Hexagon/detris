@@ -12,7 +12,7 @@ const routes = [
     ): Response | undefined {
       const meta = { 
         ...Application,
-        instance: Deno.env.get("PUP_INSTANCE") || "0"
+        instance: Deno.env.get("PUP_CLUSTER_INDEX") || "0"
       }
       return new Response(JSON.stringify(meta), {
         status: 200,
