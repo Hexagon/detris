@@ -6,13 +6,13 @@ Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 
 ## Features
 
-- Server-side stateless Tetris implementation in Deno TypeScript
-- Variety of game modes including Single Player, Co-op, and PvP
-- Intelligent AI opponent for multiplayer practice
-- Highscore tracking and leaderboards
-- Lightweight, lazy HTML5 client for gameplay
-- Utilization of Deno KV for data persistence
-- Demonstrates the capabilities of a pure Deno/Deno KV/Deno STD application without dependencies.
+- **Server-side** stateless Tetris implementation in Deno TypeScript
+- **Multiple game modes** including Single Player, Co-op, and PvP
+- **Intelligent AI** opponent for multiplayer practice
+- **Highscore** tracking and leaderboards
+- **Lightweight**, lazy HTML5 client for gameplay
+- **Deno KV** utilized for data persistence
+- **Pure Deno** / Deno KV / Deno STD application without frameworks or dependencies.
 
 ## Getting Started
 
