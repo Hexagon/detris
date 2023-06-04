@@ -8,17 +8,11 @@ Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 
 - **Server-side** stateless Tetris implementation in Deno TypeScript
 - **Multiple game modes** including Single Player, Co-op, and PvP
-- **Intelligent AI** opponent for multiplayer practice
+- **"Intelligent" AI** opponent for multiplayer practice
 - **Highscore** tracking and leaderboards
 - **Lightweight**, lazy HTML5 client for gameplay
 - **Deno KV** utilized for data persistence
 - **Pure Deno** / Deno KV / Deno STD application without frameworks or dependencies.
-
-## Getting Started
-
-To set up the development environment, follow the steps below:
-
-1. Clone this repository to your desired workspace:
 
 ## Getting Started
 
@@ -50,11 +44,9 @@ http://127.0.0.1:8080
 | DETRIS_PORT         | 8080                  |
 | DETRIS_PERSIST_PATH | <default kv location> |
 
-# Contributing to detris
+## Contributing to detris
 
 Below is a brief guide on how to contribute to Detris, all contributions/collaborations/discussions are welcome.
-
-## Contribution Guide
 
 1. **Fork the Repository**: Start by forking the official detris repository.
 
