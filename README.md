@@ -14,6 +14,58 @@ Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 - **Deno KV** utilized for data persistence
 - **Pure Deno** / Deno KV / Deno STD application without frameworks or dependencies.
 
+## Game Mechanics and Scoring
+
+### Tetrominoes and Movement
+
+Tetrominoes are generated in a queue and are held in a five-position array:
+
+- Index 0: Current dropping tetromino
+- Index 1: Upcoming tetromino 1
+- Index 2: Upcoming tetromino 2
+- Index 3: Upcoming tetromino 3
+- Index 4: On hold tetromino (Planned feature)
+
+During gameplay, players can manipulate the current tetromino in different ways:
+
+- **Move horizontally:** Shift the tetromino left or right.
+- **Rotate:** Rotate the tetromino 90 degrees clockwise or counter-clockwise.
+- **Soft drop:** Increase the speed at which the tetromino falls.
+- **Hard drop:** Instantly drop and freeze the tetromino to the bottom of the grid.
+
+### Scoring
+
+Detris rewards players for both controlling tetrominoes and clearing lines:
+
+- **Dropping tetrominoes:** Players earn 2 points for each grid cell the tetromino traverses during a hard drop. This score is then multiplied by the current level number plus one.
+
+- **Clearing lines:** When players clear lines, they earn a base score, depending on the number of lines cleared at once:
+
+- Single: 40 points
+- Double: 160 points
+- Triple: 480 points
+- Tetris (4 lines): 1280 points
+
+These base scores are also multiplied by the current level number plus one.
+
+### Levels and Speed
+
+As players clear more lines, the game's speed increases. The requirement for progressing to the next level is clearing five more lines than the previous level. The time between tetromino drops decreases by 25 ms with each new level, down to a minimum of 100 ms. This system introduces an increasing challenge as the game progresses, rewarding quick decision-making and advanced planning.
+
+In Co-Op and Battle Mode, you can play with an AI bot that, similar to human players, struggles more as the game's level increases. As the speed and complexity of the game escalate, the AI is increasingly challenged, leading to more potential missteps and exciting gameplay.
+
+### Single Player Mode
+
+In Single Player Mode, players aim to score as many points as possible before the blocks reach the top of the playfield. The falling speed of the blocks increases as the game progresses, testing players' skills as they aim for a high score.
+
+### Co-op Mode (Planned)
+
+In the planned Co-op Mode, two players will be able to work together on the same playfield, combining their efforts for a higher score. Communication and synchronization will be key to success in this mode.
+
+### Battle Mode
+
+Battle Mode introduces competitive play, where two players face off to see who can score the most points. In this mode, clearing multiple lines at once sends 'garbage' lines to the opponent's grid, adding an extra layer of strategy to the game. The game ends when one player's stack of blocks reaches the top of the playfield, and the winners score is recorded on the Highscore. 
+
 ## Getting Started
 
 To set up the development environment, follow the steps below:
