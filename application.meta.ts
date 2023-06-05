@@ -10,7 +10,7 @@
 
 const Application = {
   name: "detris",
-  version: "1.0.0-alpha.0",
+  version: "1.0.0-alpha.1",
   repository: "https://github.com/hexagon/detris",
 };
 

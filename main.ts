@@ -1,9 +1,11 @@
 // main.ts
 
-import { serve } from "https://deno.land/std@0.184.0/http/server.ts";
-import { serveFile } from "https://deno.land/std@0.184.0/http/file_server.ts";
-import { join, resolve } from "https://deno.land/std@0.184.0/path/mod.ts";
+import { serve } from "./deps.ts";
+import { serveFile } from "./deps.ts";
+import { join, resolve } from "./deps.ts";
+
 import * as highscore from "./highscores/highscores.ts";
+
 import { Player } from "./server/player.ts";
 import { Router } from "./server/router.ts";
 import { Game } from "./game/game.ts";
@@ -99,7 +101,7 @@ const MainLoop = () => {
 };
 
 // HTTP server
-serve((req: Request) => {
+serve(async (req: Request) => {
   let pathname = new URL(req.url).pathname;
 
   // Serve using websockets
@@ -115,7 +117,14 @@ serve((req: Request) => {
 
   // Serve static files, or 404
   if (pathname === "/") pathname = "/index.html";
-  return serveFile(req, resolve(join("./assets/", pathname)));
+  const resp = await serveFile(req, resolve(join("./assets/", pathname)));
+
+  if (resp.status === 200) {
+    /* Append custom headers to successful static file responses */
+    resp.headers.set("Cache-Control", "public, max-age=86400"); // 86400 seconds is 24 hours
+  }
+
+  return resp;
 }, {
   // Port number resolution
   //
