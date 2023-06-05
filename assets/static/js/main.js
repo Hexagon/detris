@@ -63,14 +63,17 @@ onScreenEvent("aborted", "mainmenu", () => {
 showScreen("modeselect");
 onScreenEvent("modeselect", "singleplayer", (nickname) => {
   showScreen("loading");
+  controls.enableTouch();
   currentGame = StartSingleplayer(nickname, network);
 });
 onScreenEvent("modeselect", "coop", (nickname, code, ai) => {
   showScreen("starting");
+  controls.enableTouch();
   currentGame = StartCoop(nickname, code, network, ai);
 });
 onScreenEvent("modeselect", "battle", (nickname, code, ai) => {
   showScreen("starting");
+  controls.enableTouch();
   currentGame = StartBattle(nickname, code, network, ai);
 });
 
