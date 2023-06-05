@@ -148,3 +148,56 @@ html {
 .playing {
   color: #99EE99;
 }
+
+#touchcontrols {
+  position:absolute;
+  top: 50vh;
+  left: 0vw;
+  width: 100vw;
+  height: 50vh;
+}
+
+#touchrot {
+  position: absolute;
+  top: -5vh;
+  left: 0vw;
+  width: 100vw;
+  height: 12.5vh;
+}
+
+#touchleft {
+  position:absolute;
+  top: 7.5vh;
+  left: 0vw;
+  width: 50vw;
+  height: 12.5vh;
+}
+
+#touchright {
+  position:absolute;
+  top: 7.5vh;
+  left: 50vw;
+  width: 50vw;
+  height: 12.5vh;
+}
+
+#touchdown {
+  position:absolute;
+  top: 20vh;
+  left: 0vw;
+  width: 100vw;
+  height: 12.5vh;
+}
+
+#touchdrop {
+  position:absolute;
+  top: 32.5vh;
+  left: 0vw;
+  width: 100vw;
+  height: 12.5vh;
+}
+
+.touch {
+  margin: 5px;
+  border: 1px solid rgba(0,0,0,0.5)
+}

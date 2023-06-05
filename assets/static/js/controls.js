@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-window-prefix
 /**
  * Keeps track of player controls
  *
@@ -6,6 +7,7 @@
 
 class Controls {
   #handleChange = null;
+  #touchControlsEnabled = false
 
   constructor() {
     this.listenKeys = [
@@ -20,6 +22,14 @@ class Controls {
 
     this.#initialize();
   }
+
+  enableTouch() {
+    this.touchControlsEnabled = true
+  } 
+
+  diableTouch() {
+    this.touchControlsEnabled = false
+  } 
 
   #setState(prop, val, _isEvent) {
     if (this.#handleChange) {
@@ -50,16 +60,53 @@ class Controls {
       if (e.code === "ArrowDown") this.#setState("down", false);
     }
   }
+  #handleTouchStart(e) {
+    if (this.touchControlsEnabled) {
+      for(const touch of e.touches) {
+        const screenCenterX = window.innerWidth / 2;
+        const screenCenterY = window.innerHeight / 2;
+        if (touch.clientY < screenCenterY) {
+          this.#setState("rotCW", true);
+        } else if (touch.clientX < screenCenterX / 2) {
+          this.#setState("rotCCW", true);
+        } else if (touch.clientX < screenCenterX) {
+          this.#setState("down", true);
+        } else {
+          this.#setState("drop", true);
+        }
+      }
+    }
+  }
+
+  #handleTouchEnd(e) {
+    if (this.#touchControlsEnabled) {
+      for(const touch of e.touches) {
+        const screenCenterX = window.innerWidth / 2;
+        const screenCenterY = window.innerHeight / 2;
+        if (touch.clientY < screenCenterY) {
+          this.#setState("rotCW", false);
+        } else if (touch.clientX < screenCenterX / 2) {
+          this.#setState("rotCCW", false);
+        } else if (touch.clientX < screenCenterX) {
+          this.#setState("down", false);
+        } else {
+          this.#setState("drop", false);
+        }
+      }
+    }
+  }
 
   #initialize() {
-    // deno-lint-ignore no-window-prefix
-    window.addEventListener("keydown", (e) => {
-      this.#handleKeyDown(e);
-    });
-    // deno-lint-ignore no-window-prefix
-    window.addEventListener("keyup", (e) => {
-      this.#handleKeyUp(e);
-    });
+    window.addEventListener("keydown", (e) => this.#handleKeyDown(e));
+    window.addEventListener("keyup", (e) => this.#handleKeyUp(e));
+    if (window.DocumentTouch && document instanceof DocumentTouch) {
+      window.addEventListener("touchstart", (e) => this.#handleTouchStart(e));
+      window.addEventListener("touchend", (e) => this.#handleTouchEnd(e));
+      window.addEventListener("touchcancel", (e) => this.#handleTouchEnd(e));
+      for(const elm of document.querySelectorAll(".touch")) {
+        elm.style.display = "block"
+      }
+    }
   }
 
   setHandleChange(callback) {
