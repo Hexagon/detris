@@ -16,7 +16,8 @@ Live at [https://tetris.56k.guru](https://tetris.56k.guru)
 - **Lightweight**, lazy HTML5 client for gameplay
 - **Deno KV** utilized for data persistence
 - **Pure Deno** / Deno KV / Deno STD application without frameworks or
-  dependencies. Uses all default settings for type checks, formatting and linting.
+  dependencies. Uses all default settings for type checks, formatting and
+  linting.
 
 ## Game Mechanics and Scoring
 
