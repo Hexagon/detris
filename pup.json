@@ -2,16 +2,22 @@
   "$schema": "https://deno.land/x/pup/docs/pup.schema.json",
   "processes": [
     {
-      "id": "detris",
+      "id": "detris-1",
       "cmd": "deno run --allow-read --allow-write --allow-net --allow-env --unstable main.ts",
+      "env": {
+        "DETRIS_PORT": "8080"
+      },
       "restart": "always",
-      "terminate": "0 45 3 * * 0",
-      "cluster": {
-        "instances": 3,
-        "commonPort": 8080,
-        "startPort": 8081,
-        "strategy": "round-robin"
-      }
+      "terminate": "0 45 3 * * 0"
+    },
+    {
+      "id": "detris-2",
+      "cmd": "deno run --allow-read --allow-write --allow-net --allow-env --unstable main.ts",
+      "env": {
+        "DETRIS_PORT": "8081"
+      },
+      "restart": "always",
+      "terminate": "0 45 3 * * 0"
     }
   ]
 }
