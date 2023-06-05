@@ -7,6 +7,7 @@
       "env": {
         "DETRIS_PORT": "8080"
       },
+      "autostart": true,
       "restart": "always",
       "terminate": "0 45 3 * * 0"
     },
@@ -16,6 +17,7 @@
       "env": {
         "DETRIS_PORT": "8081"
       },
+      "autostart": true,
       "restart": "always",
       "terminate": "0 45 3 * * 0"
     }
