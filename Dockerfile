@@ -7,7 +7,7 @@ RUN mkdir /app
 COPY . /app/
 
 # Install pup - Pin this url to a specific version in production
-RUN ["deno","install","-Afrn","pup", "https://deno.land/x/pup/pup.ts"]
+RUN ["deno","install","-Afrn","--unstable","pup", "https://deno.land/x/pup/pup.ts"]
 
 # Go!
 ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
